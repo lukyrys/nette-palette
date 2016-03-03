@@ -1,0 +1,21 @@
+{
+  "name": "pavlista/nette-palette",
+  "description": "Palette support for Nette Framework and Latte template engine",
+  "keywords": ["nette", "latte", "image", "thumbnail", "watermark", "gd", "imagick"],
+  "homepage": "https://github.com/MichaelPavlista/nette-palette",
+  "license": ["MIT"],
+  "authors": [
+    {
+      "name": "Michael Pavlista",
+      "homepage": "http://www.pavlista.cz/"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "pavlista/palette": "~1.0",
+    "nette/nette": "~2.3"
+  },
+  "autoload": {
+    "classmap": ["src/"]
+  }
+}
