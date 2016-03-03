@@ -11,18 +11,17 @@ use Nette\Application\UI\Presenter;
 class PalettePresenter extends Presenter {
 
     /**
-     * @var Palette @inject
-     */
-    public $palette;
-
-
-    /**
      * Pallete images backend render
      * @throws \Nette\Application\AbortException
      */
     public function actionImage() {
 
-        $this->palette->getStorage()->serverResponse();
+        /**
+         * @var $palette Palette
+         */
+        $palette = $this->context->getService('palette.service');
+        $palette->getStorage()->serverResponse();
+
         $this->terminate();
     }
 
