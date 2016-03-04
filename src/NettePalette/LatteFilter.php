@@ -1,12 +1,24 @@
 <?php
 
+/**
+ * This file is part of the Nette Palette (https://github.com/MichaelPavlista/nette-palette)
+ * Copyright (c) 2016 Michael Pavlista (http://www.pavlista.cz/)
+ *
+ * @author Michael Pavlista
+ * @email  michael@pavlista.cz
+ * @link   http://pavlista.cz/
+ * @link   https://www.facebook.com/MichaelPavlista
+ * @copyright 2016
+ */
+
 namespace NettePalette;
 
 use Nette\Object;
 
 /**
+ * Providing Palette support to Latte template engine
  * Class LatteFilter
- * @package Palette
+ * @package NettePalette
  */
 class LatteFilter extends Object {
 
@@ -27,6 +39,7 @@ class LatteFilter extends Object {
 
 
     /**
+     * Return url to required image
      * @param $image
      * @param null $imageQuery
      * @return null|string

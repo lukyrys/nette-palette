@@ -1,11 +1,23 @@
 <?php
 
+/**
+ * This file is part of the Nette Palette (https://github.com/MichaelPavlista/nette-palette)
+ * Copyright (c) 2016 Michael Pavlista (http://www.pavlista.cz/)
+ *
+ * @author Michael Pavlista
+ * @email  michael@pavlista.cz
+ * @link   http://pavlista.cz/
+ * @link   https://www.facebook.com/MichaelPavlista
+ * @copyright 2016
+ */
+
 namespace NettePalette;
 
 use Nette\DI\CompilerExtension;
 use Nette\DI\ServiceCreationException;
 
 /**
+ * Palette Extension for Nette Framework
  * Class PaletteExtension
  * @package Palette
  */
