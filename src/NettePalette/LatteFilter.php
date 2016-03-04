@@ -13,14 +13,12 @@
 
 namespace NettePalette;
 
-use Nette\Object;
-
 /**
  * Providing Palette support to Latte template engine
  * Class LatteFilter
  * @package NettePalette
  */
-class LatteFilter extends Object {
+class LatteFilter {
 
     /**
      * @var Palette
