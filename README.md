@@ -44,4 +44,4 @@ Seznam všech možných filtrů a effektů včetně používání samotného Pal
 ## Důležité odkazy
 - [Github Palette](https://github.com/MichaelPavlista/palette)
 - [Github Nette Palette](https://github.com/MichaelPavlista/nette-palette)
-- [Dokumentace Palette a jejích filtrů](http://www.pavlista.cz/palette/)
+- [Dokumentace Palette a jejích filtrů](http://palette.pavlista.cz/)
