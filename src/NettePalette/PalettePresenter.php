@@ -32,7 +32,7 @@ class PalettePresenter extends Presenter {
          * @var $palette Palette
          */
         $palette = $this->context->getService('palette.service');
-        $palette->getStorage()->serverResponse();
+        $palette->getGenerator()->serverResponse();
 
         $this->terminate();
     }
