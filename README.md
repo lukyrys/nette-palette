@@ -1,4 +1,4 @@
-# Vítejte v Nette Palette wiki!
+# Nette Palette
 Nette palette je rozšíření pro Nette Framework které umožňuje jednoduchuché i pokročilé úpravy obrazových souborů včetně inteligentního generování miniatur a náhledů.
 
 Palette u obrázků například umožňuje: změny rozměrů, vkládání vodoznaků, pokročilé transformace, nastavení průhlednosti a množství dalších efektních filtrů a funkcí.

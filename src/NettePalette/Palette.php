@@ -14,7 +14,7 @@
 namespace NettePalette;
 
 use Palette\Picture;
-use Palette\ServerStorage;
+use Palette\Generator\Server;
 
 /**
  * Palette service implementation for Nette Framework
@@ -24,9 +24,9 @@ use Palette\ServerStorage;
 class Palette {
 
     /**
-     * @var ServerStorage
+     * @var Server
      */
-    protected $storage;
+    protected $generator;
 
 
     /**
@@ -37,7 +37,7 @@ class Palette {
      */
     public function __construct($storagePath, $storageUrl, $basePath = NULL)  {
 
-        $this->storage = new ServerStorage($storagePath, $storageUrl, $basePath);
+        $this->generator = new Server($storagePath, $storageUrl, $basePath);
     }
 
 
@@ -48,7 +48,7 @@ class Palette {
      */
     public function __invoke($image) {
 
-        return $this->storage->loadPicture($image)->getUrl();
+        return $this->generator->loadPicture($image)->getUrl();
     }
 
 
@@ -65,7 +65,7 @@ class Palette {
             $image .= '@' . $imageQuery;
         }
 
-        return $this->storage->loadPicture($image)->getUrl();
+        return $this->generator->loadPicture($image)->getUrl();
     }
 
 
@@ -76,17 +76,17 @@ class Palette {
      */
     public function getPicture($image) {
 
-        return $this->storage->loadPicture($image);
+        return $this->generator->loadPicture($image);
     }
 
 
     /**
-     * Get Palette images storage instance
-     * @return ServerStorage
+     * Get Palette generator instance
+     * @return Server
      */
-    public function getStorage() {
+    public function getGenerator() {
 
-        return $this->storage;
+        return $this->generator;
     }
     
 }
