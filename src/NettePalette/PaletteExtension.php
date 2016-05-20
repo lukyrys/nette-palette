@@ -48,7 +48,14 @@ class PaletteExtension extends CompilerExtension {
 
         // REGISTER PALETTE SERVICE
         $builder->addDefinition($this->prefix('service'))
-                ->setClass('NettePalette\Palette', array($config['path'], $config['url'], $config['basepath']));
+                ->setClass('NettePalette\Palette', array(
+
+                    $config['path'],
+                    $config['url'],
+                    $config['basepath'],
+                    empty($config['fallbackImage']) ? NULL : $config['fallbackImage'],
+                    empty($config['template']) ? NULL : $config['template'],
+                ));
 
         // REGISTER LATTE MACRO SERVICE
         $builder->addDefinition($this->prefix('filter'))

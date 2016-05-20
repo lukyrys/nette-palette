@@ -34,10 +34,30 @@ class Palette {
      * @param string $storagePath absolute or relative path to generated thumbs (and pictures) directory
      * @param string $storageUrl absolute live url to generated thumbs (and pictures) directory
      * @param null|string $basePath absolute path to website root directory
+     * @param null|string $fallbackImage absolute or relative path to default image.
+     * @param null $templates palette image query templates
      */
-    public function __construct($storagePath, $storageUrl, $basePath = NULL)  {
+    public function __construct($storagePath,
+                                $storageUrl,
+                                $basePath = NULL,
+                                $fallbackImage = NULL,
+                                $templates = NULL)  {
 
         $this->generator = new Server($storagePath, $storageUrl, $basePath);
+
+        // REGISTER DEFINED IMAGE QUERY TEMPLATES
+        if($templates && is_array($templates)) {
+
+            foreach ($templates as $templateName => $templateQuery) {
+
+                $this->generator->setTemplateQuery($templateName, $templateQuery);
+            }
+        }
+
+        if($fallbackImage) {
+
+            $this->generator->setFallbackImage($fallbackImage);
+        }
     }
 
 

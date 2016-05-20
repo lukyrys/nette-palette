@@ -43,7 +43,7 @@ class LatteFilter {
      * @return null|string
      */
     public function __invoke($image, $imageQuery = NULL) {
-
+        
         return $this->palette->getUrl($image, $imageQuery);
     }
 
