@@ -13,6 +13,7 @@
 
 namespace NettePalette;
 
+use Palette\Generator\IPictureLoader;
 use Palette\Picture;
 use Palette\Generator\Server;
 
@@ -36,14 +37,22 @@ class Palette {
      * @param null|string $basePath absolute path to website root directory
      * @param null|string $fallbackImage absolute or relative path to default image.
      * @param null $templates palette image query templates
+     * @param IPictureLoader|NULL $pictureLoader
      */
     public function __construct($storagePath,
                                 $storageUrl,
                                 $basePath = NULL,
                                 $fallbackImage = NULL,
-                                $templates = NULL)  {
+                                $templates = NULL,
+                                IPictureLoader $pictureLoader = NULL)  {
 
         $this->generator = new Server($storagePath, $storageUrl, $basePath);
+
+        // SET PICTURE LOADER
+        if($pictureLoader) {
+
+            $this->generator->setPictureLoader($pictureLoader);
+        }
 
         // REGISTER DEFINED IMAGE QUERY TEMPLATES
         if($templates && is_array($templates)) {

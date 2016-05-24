@@ -55,6 +55,7 @@ class PaletteExtension extends CompilerExtension {
                     $config['basepath'],
                     empty($config['fallbackImage']) ? NULL : $config['fallbackImage'],
                     empty($config['template']) ? NULL : $config['template'],
+                    empty($config['pictureLoader']) ? NULL : '@' . $config['pictureLoader'],
                 ));
 
         // REGISTER LATTE MACRO SERVICE
