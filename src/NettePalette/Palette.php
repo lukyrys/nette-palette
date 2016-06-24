@@ -13,6 +13,7 @@
 
 namespace NettePalette;
 
+use Nette\Utils\Strings;
 use Palette\Generator\IPictureLoader;
 use Palette\Picture;
 use Palette\Generator\Server;
@@ -22,12 +23,16 @@ use Palette\Generator\Server;
  * Class Palette
  * @package NettePalette
  */
-class Palette {
-
-    /**
-     * @var Server
-     */
+class Palette
+{
+    /** @var Server */
     protected $generator;
+
+    /** @var string|null */
+    protected $websiteUrl;
+
+    /** @var bool is used relative urls for images? */
+    protected $isUrlRelative;
 
 
     /**
@@ -37,6 +42,7 @@ class Palette {
      * @param null|string $basePath absolute path to website root directory
      * @param null|string $fallbackImage absolute or relative path to default image.
      * @param null $templates palette image query templates
+     * @param null|string $websiteUrl
      * @param IPictureLoader|NULL $pictureLoader
      */
     public function __construct($storagePath,
@@ -44,28 +50,40 @@ class Palette {
                                 $basePath = NULL,
                                 $fallbackImage = NULL,
                                 $templates = NULL,
-                                IPictureLoader $pictureLoader = NULL)  {
-
+                                $websiteUrl = NULL,
+                                IPictureLoader $pictureLoader = NULL)
+    {
+        // Setup image generator instance
         $this->generator = new Server($storagePath, $storageUrl, $basePath);
 
-        // SET PICTURE LOADER
-        if($pictureLoader) {
-
-            $this->generator->setPictureLoader($pictureLoader);
+        // Register fallback image
+        if($fallbackImage)
+        {
+            $this->generator->setFallbackImage($fallbackImage);
         }
 
-        // REGISTER DEFINED IMAGE QUERY TEMPLATES
-        if($templates && is_array($templates)) {
-
-            foreach ($templates as $templateName => $templateQuery) {
-
+        // Register defined image query templates
+        if($templates && is_array($templates))
+        {
+            foreach ($templates as $templateName => $templateQuery)
+            {
                 $this->generator->setTemplateQuery($templateName, $templateQuery);
             }
         }
 
-        if($fallbackImage) {
+        // Set website url (optional)
+        $this->websiteUrl = $websiteUrl;
 
-            $this->generator->setFallbackImage($fallbackImage);
+        // Is used relative urls for images?
+        $this->isUrlRelative =
+            !Strings::startsWith($storageUrl, '//') &&
+            !Strings::startsWith($storageUrl, 'http://') &&
+            !Strings::startsWith($storageUrl, 'https://');
+
+        // Set custom picture loader
+        if($pictureLoader)
+        {
+            $this->generator->setPictureLoader($pictureLoader);
         }
     }
 
@@ -75,22 +93,58 @@ class Palette {
      * @param $image
      * @return null|string
      */
-    public function __invoke($image) {
-
+    public function __invoke($image)
+    {
         return $this->generator->loadPicture($image)->getUrl();
     }
 
 
     /**
-     * Get absolute url to image with specified image query string
+     * Get url to image with specified image query string
+     * Supports absolute picture url when is relative generator url set
      * @param $image
      * @param null $imageQuery
      * @return null|string
      */
-    public function getUrl($image, $imageQuery = NULL) {
+    public function getUrl($image, $imageQuery = NULL)
+    {
+        // Experimental support for absolute picture url when is relative generator url set
+        if($imageQuery && Strings::startsWith($imageQuery, '//'))
+        {
+            $imageQuery = Strings::substring($imageQuery, 2);
+            $imageUrl   = $this->getPictureGeneratorUrl($image, $imageQuery);
 
-        if(!is_null($imageQuery)) {
+            if($this->isUrlRelative)
+            {
+                if($this->websiteUrl)
+                {
+                    return $this->websiteUrl . $imageUrl;
+                }
+                else
+                {
+                    return '//' . $_SERVER['SERVER_ADDR'] . $imageUrl;
+                }
+            }
+            else
+            {
+                return $imageUrl;
+            }
+        }
 
+        return $this->getPictureGeneratorUrl($image, $imageQuery);
+    }
+
+
+    /**
+     * Get url to image with specified image query string from generator
+     * @param $image
+     * @param null $imageQuery
+     * @return null|string
+     */
+    protected function getPictureGeneratorUrl($image, $imageQuery = NULL)
+    {
+        if(!is_null($imageQuery))
+        {
             $image .= '@' . $imageQuery;
         }
 
@@ -103,8 +157,8 @@ class Palette {
      * @param $image
      * @return Picture
      */
-    public function getPicture($image) {
-
+    public function getPicture($image)
+    {
         return $this->generator->loadPicture($image);
     }
 
@@ -113,8 +167,8 @@ class Palette {
      * Get Palette generator instance
      * @return Server
      */
-    public function getGenerator() {
-
+    public function getGenerator()
+    {
         return $this->generator;
     }
     

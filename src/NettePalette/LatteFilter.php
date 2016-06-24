@@ -18,11 +18,9 @@ namespace NettePalette;
  * Class LatteFilter
  * @package NettePalette
  */
-class LatteFilter {
-
-    /**
-     * @var Palette
-     */
+class LatteFilter
+{
+    /** @var Palette service */
     private $palette;
 
 
@@ -30,8 +28,8 @@ class LatteFilter {
      * LatteFilter constructor.
      * @param Palette $palette
      */
-    public function __construct(Palette $palette) {
-
+    public function __construct(Palette $palette)
+    {
         $this->palette = $palette;
     }
 
@@ -42,8 +40,8 @@ class LatteFilter {
      * @param null $imageQuery
      * @return null|string
      */
-    public function __invoke($image, $imageQuery = NULL) {
-        
+    public function __invoke($image, $imageQuery = NULL)
+    {
         return $this->palette->getUrl($image, $imageQuery);
     }
 
