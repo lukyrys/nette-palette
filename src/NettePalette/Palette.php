@@ -14,10 +14,12 @@
 namespace NettePalette;
 
 use Nette\Utils\Strings;
+use Palette\Exception;
 use Palette\Generator\IPictureLoader;
 use Palette\Picture;
 use Palette\Generator\Server;
 use Tracy\Debugger;
+use Tracy\Dumper;
 
 /**
  * Palette service implementation for Nette Framework
@@ -36,13 +38,13 @@ class Palette
     protected $isUrlRelative;
 
     /** @var bool catch exceptions? */
-    protected $catchException;
+    protected $catchException = TRUE;
 
     /** @var bool return fallback image on exception? */
-    protected $fallbackImageOnException;
+    protected $fallbackImageOnException = TRUE;
 
     /** @var bool|string exceptions? FALSE = no, TRUE = yes, string = only exception messages to log file */
-    protected $logException;
+    protected $logException = 'palette';
 
 
     /**
@@ -104,7 +106,7 @@ class Palette
      * @param bool $fallbackToImage return fallback image on exception?
      * @param bool|string $log exceptions? FALSE = no, TRUE = yes, string = only exception messages to log file
      */
-    public function setServerExceptionHandling($catch = FALSE, $fallbackToImage = FALSE, $log = FALSE)
+    public function setServerExceptionHandling($catch = TRUE, $fallbackToImage = TRUE, $log = 'palette')
     {
         $this->catchException = $catch;
         $this->fallbackImageOnException = $fallbackToImage;
@@ -207,7 +209,7 @@ class Palette
         {
             try
             {
-                //$this->generator->serverResponse();
+                $this->generator->serverResponse();
             }
             catch (\Exception $exception)
             {
@@ -229,7 +231,17 @@ class Palette
                 // Return fallback image
                 if($this->fallbackImageOnException && $fallbackImage)
                 {
+                    $paletteQuery = preg_replace('/.*@(.*)/', $fallbackImage . '@$1', $_GET['imageQuery']);
 
+                    $picture  = $this->generator->loadPicture($paletteQuery);
+                    $savePath = $this->generator->getPath($picture);
+
+                    if(!file_exists($savePath))
+                    {
+                        $picture->save($savePath);
+                    }
+
+                    $picture->output();
                 }
 
             }
@@ -237,7 +249,7 @@ class Palette
         // Exceptions are not catched
         else
         {
-            //$this->generator->serverResponse();
+            $this->generator->serverResponse();
         }
     }
     

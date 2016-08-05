@@ -70,7 +70,13 @@ class PaletteExtension extends CompilerExtension
                     empty($config['template']) ? NULL : $config['template'],
                     empty($config['websiteUrl']) ? NULL : $config['websiteUrl'],
                     empty($config['pictureLoader']) ? NULL : $config['pictureLoader'],
-                ));
+                ))
+                ->addSetup('setServerExceptionHandling', [
+
+                    $serverException['catch'],
+                    $serverException['fallbackToImage'],
+                    $serverException['log'],
+                ]);
 
         // Register latte filter service
         $builder->addDefinition($this->prefix('filter'))
