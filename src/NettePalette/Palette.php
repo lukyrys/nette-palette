@@ -34,8 +34,13 @@ class Palette
     /** @var bool is used relative urls for images? */
     protected $isUrlRelative;
 
+    /** @var bool catch exceptions? */
     protected $catchException;
+
+    /** @var bool return fallback image on exception? */
     protected $fallbackImageOnException;
+
+    /** @var bool|string exceptions? FALSE = no, TRUE = yes, string = only exception messages to log file */
     protected $logException;
 
 
