@@ -34,6 +34,10 @@ class Palette
     /** @var bool is used relative urls for images? */
     protected $isUrlRelative;
 
+    protected $catchException;
+    protected $fallbackImageOnException;
+    protected $logException;
+
 
     /**
      * Palette constructor.
@@ -85,6 +89,20 @@ class Palette
         {
             $this->generator->setPictureLoader($pictureLoader);
         }
+    }
+
+
+    /**
+     * Set server image generation behavior on exception
+     * @param bool $catch catch exceptions?
+     * @param bool $fallbackToImage return fallback image on exception?
+     * @param bool|string $log exceptions? FALSE = no, TRUE = yes, string = only exception messages to log file
+     */
+    public function setServerExceptionHandling($catch = FALSE, $fallbackToImage = FALSE, $log = FALSE)
+    {
+        $this->catchException = $catch;
+        $this->fallbackImageOnException = $fallbackToImage;
+        $this->logException = $log;
     }
 
 
@@ -170,6 +188,15 @@ class Palette
     public function getGenerator()
     {
         return $this->generator;
+    }
+
+
+    /**
+     * Execute palette service generator backend
+     */
+    public function serverResponse()
+    {
+        $this->generator->serverResponse();
     }
     
 }
