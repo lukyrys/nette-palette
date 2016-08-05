@@ -43,6 +43,19 @@ class PaletteExtension extends CompilerExtension
             throw new ServiceCreationException('Missing required url parameter in PaletteExtension configuration');
         }
 
+        // Build server exception handling config
+        if(empty($config['serverException']) || !is_array($config['serverException']))
+        {
+            $config['serverException'] = [];
+        }
+
+        $serverException = [
+
+            'catch' => isset($config['serverException']['catch']) ? $config['serverException']['catch'] : TRUE,
+            'fallbackToImage' => isset($config['serverException']['fallbackToImage']) ? $config['serverException']['fallbackToImage'] : TRUE,
+            'log' => isset($config['serverException']['log']) ? $config['serverException']['log'] : 'palette',
+        ];
+
         // Register extension services
         $builder = $this->getContainerBuilder();
 

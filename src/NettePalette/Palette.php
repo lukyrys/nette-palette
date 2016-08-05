@@ -17,6 +17,7 @@ use Nette\Utils\Strings;
 use Palette\Generator\IPictureLoader;
 use Palette\Picture;
 use Palette\Generator\Server;
+use Tracy\Debugger;
 
 /**
  * Palette service implementation for Nette Framework
@@ -201,7 +202,43 @@ class Palette
      */
     public function serverResponse()
     {
-        $this->generator->serverResponse();
+        // Exceptions are catched
+        if($this->catchException)
+        {
+            try
+            {
+                //$this->generator->serverResponse();
+            }
+            catch (\Exception $exception)
+            {
+                // Log catched exception
+                if($this->logException)
+                {
+                    if(is_string($this->logException))
+                    {
+                        Debugger::log($exception->getMessage(), $this->logException);
+                    }
+                    else
+                    {
+                        Debugger::log($exception);
+                    }
+                }
+
+                $fallbackImage = $this->generator->getFallbackImage();
+
+                // Return fallback image
+                if($this->fallbackImageOnException && $fallbackImage)
+                {
+
+                }
+
+            }
+        }
+        // Exceptions are not catched
+        else
+        {
+            //$this->generator->serverResponse();
+        }
     }
     
 }
