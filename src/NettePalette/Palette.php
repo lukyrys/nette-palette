@@ -210,7 +210,6 @@ class Palette
     {
         try
         {
-            throw new \Exception('FUUU');
             $this->generator->serverResponse();
         }
         catch(\Exception $exception)
