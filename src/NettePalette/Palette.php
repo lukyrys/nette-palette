@@ -19,7 +19,6 @@ use Palette\Generator\IPictureLoader;
 use Palette\Picture;
 use Palette\Generator\Server;
 use Tracy\Debugger;
-use Tracy\Dumper;
 
 /**
  * Palette service implementation for Nette Framework
@@ -37,14 +36,12 @@ class Palette
     /** @var bool is used relative urls for images? */
     protected $isUrlRelative;
 
-    /** @var bool catch exceptions? */
-    protected $catchException = TRUE;
-
-    /** @var bool return fallback image on exception? */
-    protected $fallbackImageOnException = TRUE;
-
-    /** @var bool|string exceptions? FALSE = no, TRUE = yes, string = only exception messages to log file */
-    protected $logException = 'palette';
+    /** @var bool|string generator exceptions handling
+     * FALSE = exceptions are thrown
+     * TRUE = exceptions are begin detailed logged via Tracy\Debugger
+     * string = only exception messages are begin logged to specified log file via Tracy\Debugger
+     */
+    protected $handleExceptions = TRUE;
 
 
     /**
@@ -101,16 +98,23 @@ class Palette
 
 
     /**
-     * Set server image generation behavior on exception
-     * @param bool $catch catch exceptions?
-     * @param bool $fallbackToImage return fallback image on exception?
-     * @param bool|string $log exceptions? FALSE = no, TRUE = yes, string = only exception messages to log file
+     * Set generator exceptions handling (image generation via url link)
+     * FALSE = exceptions are thrown
+     * TRUE = exceptions are begin detailed logged via Tracy\Debugger
+     * string = only exception messages are begin logged to specified log file via Tracy\Debugger
+     * @param $handleExceptions
+     * @throws Exception
      */
-    public function setServerExceptionHandling($catch = TRUE, $fallbackToImage = TRUE, $log = 'palette')
+    public function setHandleExceptions($handleExceptions)
     {
-        $this->catchException = $catch;
-        $this->fallbackImageOnException = $fallbackToImage;
-        $this->logException = $log;
+        if(is_bool($handleExceptions) || is_string($handleExceptions))
+        {
+            $this->handleExceptions = $handleExceptions;
+        }
+        else
+        {
+            throw new Exception('Invalid value for handleExceptions in configuration');
+        }
     }
 
 
@@ -204,54 +208,48 @@ class Palette
      */
     public function serverResponse()
     {
-        // Exceptions are catched
-        if($this->catchException)
+        try
         {
-            try
-            {
-                $this->generator->serverResponse();
-            }
-            catch (\Exception $exception)
-            {
-                // Log catched exception
-                if($this->logException)
-                {
-                    if(is_string($this->logException))
-                    {
-                        Debugger::log($exception->getMessage(), $this->logException);
-                    }
-                    else
-                    {
-                        Debugger::log($exception);
-                    }
-                }
-
-                $fallbackImage = $this->generator->getFallbackImage();
-
-                // Return fallback image
-                if($this->fallbackImageOnException && $fallbackImage)
-                {
-                    $paletteQuery = preg_replace('/.*@(.*)/', $fallbackImage . '@$1', $_GET['imageQuery']);
-
-                    $picture  = $this->generator->loadPicture($paletteQuery);
-                    $savePath = $this->generator->getPath($picture);
-
-                    if(!file_exists($savePath))
-                    {
-                        $picture->save($savePath);
-                    }
-
-                    $picture->output();
-                }
-
-            }
-        }
-        // Exceptions are not catched
-        else
-        {
+            throw new \Exception('FUUU');
             $this->generator->serverResponse();
+        }
+        catch(\Exception $exception)
+        {
+            // Handle server generating image response exception
+            if($this->handleExceptions)
+            {
+                if(is_string($this->handleExceptions))
+                {
+                    Debugger::log($exception->getMessage(), $this->handleExceptions);
+                }
+                else
+                {
+                    Debugger::log($exception, 'palette');
+                }
+            }
+            else
+            {
+                throw $exception;
+            }
+
+            // Return fallback image on exception if fallback image is configured
+            $fallbackImage = $this->generator->getFallbackImage();
+
+            if($fallbackImage)
+            {
+                $paletteQuery = preg_replace('/.*@(.*)/', $fallbackImage . '@$1', $_GET['imageQuery']);
+
+                $picture  = $this->generator->loadPicture($paletteQuery);
+                $savePath = $this->generator->getPath($picture);
+
+                if(!file_exists($savePath))
+                {
+                    $picture->save($savePath);
+                }
+
+                $picture->output();
+            }
         }
     }
     
 }
-
