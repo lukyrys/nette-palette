@@ -13,10 +13,10 @@
   "require": {
     "php": ">=5.4.0",
     "pavlista/palette": "~2.5",
-    "nette/di": "~2.3",
-    "nette/application": "~2.3",
+    "nette/di": "~2.3|^3.0",
+    "nette/application": "~2.3|^3.0",
     "latte/latte": "~2.3",
-    "nette/utils": "~2.3",
+    "nette/utils": "~2.3|^3.0",
     "tracy/tracy": "~2.3"
   },
   "autoload": {

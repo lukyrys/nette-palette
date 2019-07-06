@@ -34,5 +34,4 @@ class PalettePresenter extends Presenter
 
         $this->terminate();
     }
-
 }

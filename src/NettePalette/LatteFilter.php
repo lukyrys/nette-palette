@@ -44,5 +44,4 @@ class LatteFilter
     {
         return $this->palette->getUrl($image, $imageQuery);
     }
-
 }
