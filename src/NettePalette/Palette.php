@@ -14,11 +14,13 @@
 namespace NettePalette;
 
 use Nette\Utils\Strings;
+use Palette\DecryptionException;
 use Palette\Exception;
 use Palette\Generator\IPictureLoader;
 use Palette\Picture;
 use Palette\Generator\Server;
 use Tracy\Debugger;
+use Tracy\ILogger;
 
 /**
  * Palette service implementation for Nette Framework
@@ -57,13 +59,16 @@ class Palette
     public function __construct($storagePath,
                                 $storageUrl,
                                 $basePath = NULL,
+                                $key = NULL,
+                                $cypherMethod = NULL,
+                                $iv = NULL,
                                 $fallbackImage = NULL,
                                 $templates = NULL,
                                 $websiteUrl = NULL,
                                 IPictureLoader $pictureLoader = NULL)
     {
         // Setup image generator instance
-        $this->generator = new Server($storagePath, $storageUrl, $basePath);
+        $this->generator = new Server($storagePath, $storageUrl, $basePath, $key, $cypherMethod, $iv);
 
         // Register fallback image
         if($fallbackImage)
@@ -217,7 +222,11 @@ class Palette
             // Handle server generating image response exception
             if($this->handleExceptions)
             {
-                if(is_string($this->handleExceptions))
+                if ($exception instanceof DecryptionException)
+                {
+                    Debugger::log($exception->getMessage(), ILogger::INFO);
+                }
+                elseif(is_string($this->handleExceptions))
                 {
                     Debugger::log($exception->getMessage(), $this->handleExceptions);
                 }
@@ -250,5 +259,5 @@ class Palette
             }
         }
     }
-    
+
 }
