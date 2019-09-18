@@ -19,6 +19,7 @@ Palette u obrázků například umožňuje: změny rozměrů, vkládání vodozn
         path: 'files/thumbs/'
         url: 'http://website.com/files/thumbs/'
         basepath: '/var/www/website.com/www/files/'
+        signingKey: '%uniqueSigningKey%'
 
 - **path:** Je relativní nebo absolutní cesta ke složce do které se mají vygenerované miniatury a obrázky ukládat. Tato složka musí existovat a musí být do ní možné zapisovat!
 - **url:** Absolutní url adresa s lomítkem na konci na které je složka s miniatury veřejně dostupná.

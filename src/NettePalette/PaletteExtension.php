@@ -16,8 +16,6 @@ namespace NettePalette;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\FactoryDefinition;
 use Nette\DI\ServiceCreationException;
-use Nette\DI\ServiceDefinition;
-use Tracy\Debugger;
 
 /**
  * Palette Extension for Nette Framework
@@ -46,6 +44,11 @@ class PaletteExtension extends CompilerExtension
             throw new ServiceCreationException('Missing required url parameter in PaletteExtension configuration');
         }
 
+        if(!isset($config['signingKey']))
+        {
+            throw new ServiceCreationException('Missing required parameter signingKey in PaletteExtension configuration');
+        }
+
         // Register extension services
         $builder = $this->getContainerBuilder();
 
@@ -56,10 +59,8 @@ class PaletteExtension extends CompilerExtension
 
                     $config['path'],
                     $config['url'],
-                    $config['basepath'],
-                    $config['key'],
-                    empty($config['cypherMethod']) ? NULL: $config['cypherMethod'],
-                    $config['iv'],
+                    empty($config['basepath']) ? NULL : $config['basepath'],
+                    $config['signingKey'],
                     empty($config['fallbackImage']) ? NULL : $config['fallbackImage'],
                     empty($config['template']) ? NULL : $config['template'],
                     empty($config['websiteUrl']) ? NULL : $config['websiteUrl'],

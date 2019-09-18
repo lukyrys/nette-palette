@@ -14,13 +14,12 @@
 namespace NettePalette;
 
 use Nette\Utils\Strings;
-use Palette\DecryptionException;
 use Palette\Exception;
 use Palette\Generator\IPictureLoader;
 use Palette\Picture;
 use Palette\Generator\Server;
+use Palette\SecurityException;
 use Tracy\Debugger;
-use Tracy\ILogger;
 
 /**
  * Palette service implementation for Nette Framework
@@ -51,24 +50,24 @@ class Palette
      * @param string $storagePath absolute or relative path to generated thumbs (and pictures) directory
      * @param string $storageUrl absolute live url to generated thumbs (and pictures) directory
      * @param null|string $basePath absolute path to website root directory
+     * @param string $signingKey
      * @param null|string $fallbackImage absolute or relative path to default image.
      * @param null $templates palette image query templates
      * @param null|string $websiteUrl
      * @param IPictureLoader|NULL $pictureLoader
+     * @throws
      */
     public function __construct($storagePath,
                                 $storageUrl,
-                                $basePath = NULL,
-                                $key = NULL,
-                                $cypherMethod = NULL,
-                                $iv = NULL,
+                                $basePath,
+                                $signingKey,
                                 $fallbackImage = NULL,
                                 $templates = NULL,
                                 $websiteUrl = NULL,
                                 IPictureLoader $pictureLoader = NULL)
     {
         // Setup image generator instance
-        $this->generator = new Server($storagePath, $storageUrl, $basePath, $key, $cypherMethod, $iv);
+        $this->generator = new Server($storagePath, $storageUrl, $basePath, $signingKey);
 
         // Register fallback image
         if($fallbackImage)
@@ -127,6 +126,7 @@ class Palette
      * Get absolute url to image with specified image query string
      * @param $image
      * @return null|string
+     * @throws
      */
     public function __invoke($image)
     {
@@ -155,15 +155,11 @@ class Palette
                 {
                     return $this->websiteUrl . $imageUrl;
                 }
-                else
-                {
-                    return '//' . $_SERVER['SERVER_ADDR'] . $imageUrl;
-                }
+
+                return '//' . $_SERVER['SERVER_ADDR'] . $imageUrl;
             }
-            else
-            {
-                return $imageUrl;
-            }
+
+            return $imageUrl;
         }
 
         return $this->getPictureGeneratorUrl($image, $imageQuery);
@@ -175,10 +171,11 @@ class Palette
      * @param $image
      * @param null $imageQuery
      * @return null|string
+     * @throws
      */
     protected function getPictureGeneratorUrl($image, $imageQuery = NULL)
     {
-        if(!is_null($imageQuery))
+        if($imageQuery !== NULL)
         {
             $image .= '@' . $imageQuery;
         }
@@ -191,6 +188,7 @@ class Palette
      * Get Palette picture instance
      * @param $image
      * @return Picture
+     * @throws
      */
     public function getPicture($image)
     {
@@ -210,6 +208,7 @@ class Palette
 
     /**
      * Execute palette service generator backend
+     * @throws
      */
     public function serverResponse()
     {
@@ -222,9 +221,9 @@ class Palette
             // Handle server generating image response exception
             if($this->handleExceptions)
             {
-                if ($exception instanceof DecryptionException)
+                if ($exception instanceof SecurityException)
                 {
-                    Debugger::log($exception->getMessage(), ILogger::INFO);
+                    Debugger::log($exception->getMessage(), 'palette.security');
                 }
                 elseif(is_string($this->handleExceptions))
                 {
