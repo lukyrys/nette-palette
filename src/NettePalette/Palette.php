@@ -224,6 +224,7 @@ class Palette
                 if ($exception instanceof SecurityException)
                 {
                     Debugger::log($exception->getMessage(), 'palette.security');
+                    exit;
                 }
                 elseif(is_string($this->handleExceptions))
                 {
