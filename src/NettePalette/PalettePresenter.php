@@ -23,8 +23,8 @@ use Nette\Application\UI\Presenter;
 class PalettePresenter extends Presenter
 {
     /**
-     * Pallete images backend render
-     * @throws \Nette\Application\AbortException
+     * Palette images backend render
+     * @throws
      */
     public function actionImage()
     {
