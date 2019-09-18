@@ -53,28 +53,23 @@ class PaletteExtension extends CompilerExtension
         $builder = $this->getContainerBuilder();
 
         // Register palette service
-        $builder->addDefinition($this->prefix('service'))
-                ->setType('NettePalette\Palette')
-                ->setArguments(array(
+        $this->configureService($builder->addDefinition($this->prefix('service')), 'NettePalette\Palette', array(
 
-                    $config['path'],
-                    $config['url'],
-                    empty($config['basepath']) ? NULL : $config['basepath'],
-                    $config['signingKey'],
-                    empty($config['fallbackImage']) ? NULL : $config['fallbackImage'],
-                    empty($config['template']) ? NULL : $config['template'],
-                    empty($config['websiteUrl']) ? NULL : $config['websiteUrl'],
-                    empty($config['pictureLoader']) ? NULL : $config['pictureLoader'],
-                ))
-                ->addSetup('setHandleExceptions', [
-
-                    !isset($config['handleException']) ? TRUE : $config['handleException'],
-                ]);
+            $config['path'],
+            $config['url'],
+            empty($config['basepath']) ? NULL : $config['basepath'],
+            $config['signingKey'],
+            empty($config['fallbackImage']) ? NULL : $config['fallbackImage'],
+            empty($config['template']) ? NULL : $config['template'],
+            empty($config['websiteUrl']) ? NULL : $config['websiteUrl'],
+            empty($config['pictureLoader']) ? NULL : $config['pictureLoader'],
+        ))
+             ->addSetup('setHandleExceptions', [
+                 !isset($config['handleException']) ? TRUE : $config['handleException'],
+             ]);
 
         // Register latte filter service
-        $builder->addDefinition($this->prefix('filter'))
-                ->setType('NettePalette\LatteFilter')
-                ->setArguments([$this->prefix('@service')]);
+        $this->configureService($builder->addDefinition($this->prefix('filter'), 'NettePalette\LatteFilter', [$this->prefix('@service')])
 
         // Register latte filter
         $latteService = $this->getLatteService();
@@ -89,6 +84,23 @@ class PaletteExtension extends CompilerExtension
         // Register extension presenter
         $builder->getDefinition('nette.presenterFactory')
                 ->addSetup('setMapping', [['Palette' => 'NettePalette\*Presenter']]);
+    }
+
+
+
+    private function configureService($service, $type, array $arguments)
+    {
+        if(method_exists($service, 'setType') && method_exists($service, 'setArguments'))
+        {
+            $service->setType($type);
+            $service->setArguments($arguments);
+        }
+        elseif(method_exists($service, 'setClass'))
+        {
+            $service->setClass($type, $arguments);
+        }
+
+        return $service;
     }
 
 
