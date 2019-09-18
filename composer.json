@@ -3,7 +3,7 @@
   "description": "Palette support for Nette Framework and Latte template engine",
   "keywords": ["nette", "latte", "image", "thumbnail", "watermark", "gd", "imagick"],
   "homepage": "https://github.com/MichaelPavlista/nette-palette",
-  "license": ["MIT"],
+  "license": "MIT",
   "authors": [
     {
       "name": "Michael Pavlista",
@@ -11,13 +11,18 @@
     }
   ],
   "require": {
-    "php": ">=5.4.0",
+    "php": ">=7.1.0",
     "pavlista/palette": "~2.7",
-    "nette/di": "~2.3",
-    "nette/application": "~2.3",
+
+    "nette/di": "^3.0",
+    "nette/application": "^3.0",
+    "nette/utils": "^3.0",
     "latte/latte": "~2.3",
-    "nette/utils": "~2.3",
     "tracy/tracy": "~2.3"
+  }
+  ,
+  "require-dev": {
+    "roave/security-advisories": "dev-master"
   },
   "autoload": {
     "classmap": ["src/"]

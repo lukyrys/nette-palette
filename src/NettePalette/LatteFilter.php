@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Nette Palette (https://github.com/MichaelPavlista/nette-palette)
@@ -36,11 +36,11 @@ class LatteFilter
 
     /**
      * Return url to required image
-     * @param $image
-     * @param null $imageQuery
-     * @return null|string
+     * @param string $image
+     * @param string|null $imageQuery
+     * @return string|null
      */
-    public function __invoke($image, $imageQuery = NULL)
+    public function __invoke(string $image, ?string $imageQuery = NULL): ?string
     {
         return $this->palette->getUrl($image, $imageQuery);
     }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Nette Palette (https://github.com/MichaelPavlista/nette-palette)
@@ -13,13 +13,13 @@
 
 namespace NettePalette;
 
-use Nette\Utils\Strings;
-use Palette\Exception;
-use Palette\Generator\IPictureLoader;
+use Tracy\Debugger;
 use Palette\Picture;
+use Palette\Exception;
+use Nette\Utils\Strings;
 use Palette\Generator\Server;
 use Palette\SecurityException;
-use Tracy\Debugger;
+use Palette\Generator\IPictureLoader;
 use Nette\Application\BadRequestException;
 
 /**
@@ -58,13 +58,13 @@ class Palette
      * @param IPictureLoader|NULL $pictureLoader
      * @throws
      */
-    public function __construct($storagePath,
-                                $storageUrl,
-                                $basePath,
-                                $signingKey,
-                                $fallbackImage = NULL,
+    public function __construct(string $storagePath,
+                                string $storageUrl,
+                                ?string $basePath,
+                                string $signingKey,
+                                ?string $fallbackImage = NULL,
                                 $templates = NULL,
-                                $websiteUrl = NULL,
+                                ?string $websiteUrl = NULL,
                                 IPictureLoader $pictureLoader = NULL)
     {
         // Setup image generator instance
@@ -110,7 +110,7 @@ class Palette
      * @param $handleExceptions
      * @throws Exception
      */
-    public function setHandleExceptions($handleExceptions)
+    public function setHandleExceptions($handleExceptions): void
     {
         if(is_bool($handleExceptions) || is_string($handleExceptions))
         {
@@ -129,7 +129,7 @@ class Palette
      * @return null|string
      * @throws
      */
-    public function __invoke($image)
+    public function __invoke(string $image): ?string
     {
         return $this->generator->loadPicture($image)->getUrl();
     }
@@ -138,11 +138,11 @@ class Palette
     /**
      * Get url to image with specified image query string
      * Supports absolute picture url when is relative generator url set
-     * @param $image
-     * @param null $imageQuery
+     * @param string $image
+     * @param string|null $imageQuery
      * @return null|string
      */
-    public function getUrl($image, $imageQuery = NULL)
+    public function getUrl(string $image, ?string $imageQuery = NULL): ?string
     {
         // Experimental support for absolute picture url when is relative generator url set
         if($imageQuery && Strings::startsWith($imageQuery, '//'))
@@ -174,7 +174,7 @@ class Palette
      * @return null|string
      * @throws
      */
-    protected function getPictureGeneratorUrl($image, $imageQuery = NULL)
+    protected function getPictureGeneratorUrl($image, $imageQuery = NULL): ?string
     {
         if($imageQuery !== NULL)
         {
@@ -191,7 +191,7 @@ class Palette
      * @return Picture
      * @throws
      */
-    public function getPicture($image)
+    public function getPicture($image): Picture
     {
         return $this->generator->loadPicture($image);
     }
@@ -201,7 +201,7 @@ class Palette
      * Get Palette generator instance
      * @return Server
      */
-    public function getGenerator()
+    public function getGenerator(): Server
     {
         return $this->generator;
     }
@@ -211,7 +211,7 @@ class Palette
      * Execute palette service generator backend
      * @throws
      */
-    public function serverResponse()
+    public function serverResponse(): void
     {
         try
         {
@@ -228,7 +228,8 @@ class Palette
 
                     throw new BadRequestException("Image doesn't exist");
                 }
-                elseif(is_string($this->handleExceptions))
+
+                if (is_string($this->handleExceptions))
                 {
                     Debugger::log($exception->getMessage(), $this->handleExceptions);
                 }

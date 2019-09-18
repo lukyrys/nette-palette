@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Nette Palette (https://github.com/MichaelPavlista/nette-palette)
@@ -23,10 +23,10 @@ use Nette\Application\UI\Presenter;
 class PalettePresenter extends Presenter
 {
     /**
-     * Palette images backend render
+     * Palette images backend endpoint.
      * @throws
      */
-    public function actionImage()
+    public function actionImage(): void
     {
         /** @var $palette Palette */
         $palette = $this->context->getService('palette.service');

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Nette Palette (https://github.com/MichaelPavlista/nette-palette)
@@ -14,7 +14,10 @@
 namespace NettePalette;
 
 use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\Definition;
 use Nette\DI\ServiceCreationException;
+use Nette\DI\Definitions\ServiceDefinition;
+use Nette\DI\Definitions\FactoryDefinition;
 
 /**
  * Palette Extension for Nette Framework
@@ -28,7 +31,7 @@ class PaletteExtension extends CompilerExtension
      * @return void
      * @throws ServiceCreationException
      */
-    public function loadConfiguration()
+    public function loadConfiguration(): void
     {
         // Load extension configuration
         $config = $this->getConfig();
@@ -53,7 +56,8 @@ class PaletteExtension extends CompilerExtension
 
         // Register palette service
         $builder->addDefinition($this->prefix('service'))
-                ->setClass('NettePalette\Palette', array(
+                ->setType(Palette::class)
+                ->setArguments([
 
                     $config['path'],
                     $config['url'],
@@ -63,19 +67,26 @@ class PaletteExtension extends CompilerExtension
                     empty($config['template']) ? NULL : $config['template'],
                     empty($config['websiteUrl']) ? NULL : $config['websiteUrl'],
                     empty($config['pictureLoader']) ? NULL : $config['pictureLoader'],
-                ))
+                ])
                 ->addSetup('setHandleExceptions', [
 
-                    !isset($config['handleException']) ? TRUE : $config['handleException'],
+                    $config['handleException'] ?? TRUE,
                 ]);
 
         // Register latte filter service
         $builder->addDefinition($this->prefix('filter'))
-                ->setClass('NettePalette\LatteFilter', [$this->prefix('@service')]);
+                ->setType(LatteFilter::class)
+                ->setArguments([$this->prefix('@service')]);
 
         // Register latte filter
-        $this->getLatteService()
-             ->addSetup('addFilter', ['palette', $this->prefix('@filter')]);
+        $latteService = $this->getLatteService();
+
+        if($latteService instanceof FactoryDefinition)
+        {
+            $latteService = $latteService->getResultDefinition();
+        }
+
+        $latteService->addSetup('addFilter', ['palette', $this->prefix('@filter')]);
 
         // Register extension presenter
         $builder->getDefinition('nette.presenterFactory')
@@ -85,9 +96,9 @@ class PaletteExtension extends CompilerExtension
 
     /**
      * Get Latte service definition
-     * @return \Nette\DI\ServiceDefinition
+     * @return ServiceDefinition|FactoryDefinition
      */
-    protected function getLatteService()
+    protected function getLatteService(): Definition
     {
         $builder = $this->getContainerBuilder();
 
