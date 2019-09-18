@@ -20,6 +20,7 @@ use Palette\Picture;
 use Palette\Generator\Server;
 use Palette\SecurityException;
 use Tracy\Debugger;
+use Nette\Application\BadRequestException;
 
 /**
  * Palette service implementation for Nette Framework
@@ -224,7 +225,8 @@ class Palette
                 if ($exception instanceof SecurityException)
                 {
                     Debugger::log($exception->getMessage(), 'palette.security');
-                    exit;
+
+                    throw new BadRequestException("Image doesn't exist");
                 }
                 elseif(is_string($this->handleExceptions))
                 {
@@ -257,6 +259,8 @@ class Palette
 
                 $picture->output();
             }
+
+            throw new BadRequestException("Image doesn't exist");
         }
     }
 }
