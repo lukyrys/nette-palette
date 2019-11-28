@@ -58,14 +58,16 @@ class Palette
      * @param IPictureLoader|NULL $pictureLoader
      * @throws
      */
-    public function __construct(string $storagePath,
-                                string $storageUrl,
-                                ?string $basePath,
-                                string $signingKey,
-                                ?string $fallbackImage = NULL,
-                                $templates = NULL,
-                                ?string $websiteUrl = NULL,
-                                IPictureLoader $pictureLoader = NULL)
+    public function __construct(
+        string $storagePath,
+        string $storageUrl,
+        ?string $basePath,
+        string $signingKey,
+        ?string $fallbackImage = NULL,
+        $templates = NULL,
+        ?string $websiteUrl = NULL,
+        IPictureLoader $pictureLoader = NULL
+    )
     {
         // Setup image generator instance
         $this->generator = new Server($storagePath, $storageUrl, $basePath, $signingKey);
@@ -213,8 +215,14 @@ class Palette
      */
     public function serverResponse(): void
     {
+        $requestImageQuery = '';
+
         try
         {
+            // Get image query from url.
+            $requestImageQuery = $this->generator->getRequestImageQuery();
+
+            // Process server response.
             $this->generator->serverResponse();
         }
         catch(\Exception $exception)
@@ -248,7 +256,7 @@ class Palette
 
             if($fallbackImage)
             {
-                $paletteQuery = preg_replace('/.*@(.*)/', $fallbackImage . '@$1', $_GET['imageQuery']);
+                $paletteQuery = preg_replace('/.*@(.*)/', $fallbackImage . '@$1', $requestImageQuery);
 
                 $picture  = $this->generator->loadPicture($paletteQuery);
                 $savePath = $this->generator->getPath($picture);
