@@ -14,6 +14,7 @@
 namespace NettePalette;
 
 use Nette\Application\UI\Presenter;
+use Nette\DI\Container;
 
 /**
  * Palette Presenter for on demand generation images with palette
@@ -22,6 +23,22 @@ use Nette\Application\UI\Presenter;
  */
 class PalettePresenter extends Presenter
 {
+    /** @var Container */
+    private $container;
+
+
+    /**
+     * PalettePresenter constructor.
+     * @param Container $container
+     */
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+
+        parent::__construct();
+    }
+
+
     /**
      * Palette images backend endpoint.
      * @throws
@@ -29,7 +46,7 @@ class PalettePresenter extends Presenter
     public function actionImage(): void
     {
         /** @var $palette Palette */
-        $palette = $this->context->getService('palette.service');
+        $palette = $this->container->getService('palette.service');
         $palette->serverResponse();
 
         $this->terminate();

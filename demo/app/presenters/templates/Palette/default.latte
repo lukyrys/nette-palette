@@ -1,0 +1,6 @@
+{block content}
+Palette DemoApp. <br />
+
+{var $image = realpath('../images/portrait.jpg')}
+
+<img src="{$image|palette:'100;100'}" alt="Palette" />
