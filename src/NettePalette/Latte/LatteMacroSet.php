@@ -74,7 +74,7 @@ final class LatteMacroSet extends MacroSet
 
         //// Vygenerování source setů přes palette.
         $node->innerContent .= $writer->write(
-            '<?php echo NettePalette\Latte\LatteHelpers::generatePictureSrcSetHtml($this->global->palette, $__palettePictureUrl); unset($__palettePictureUrl); ?>'
+            '<?php echo NettePalette\Latte\LatteHelpers::generatePictureSrcSetHtml($this->global->palette, $__paletteSourcePicture); unset($__paletteSourcePicture); ?>'
         );
 
         return '';
@@ -108,7 +108,7 @@ final class LatteMacroSet extends MacroSet
         // Vygenerujeme PHP/HTML kód img tagu s fallbackem picture setu.
         return
             ' ?> src="<?php ' .
-            $writer->write('$__palettePictureUrl=$this->global->palette->getPictureUrl(true, %node.args); echo $__palettePictureUrl->getPictureUrl(); ') .
+            $writer->write('$__paletteSourcePicture=$this->global->palette->getSourcePicture(true, %node.args); echo $__paletteSourcePicture->getPictureUrl(); ') .
             '?>"<?php ';
     }
 }

@@ -15,7 +15,7 @@ namespace NettePalette\Latte;
 
 use Nette\Utils\Image;
 use NettePalette\Palette;
-use NettePalette\PictureUrl;
+use NettePalette\SourcePicture;
 use Palette\Exception;
 use Palette\Picture;
 
@@ -41,36 +41,36 @@ final class LatteHelpers
     /**
      * Vygeneruje HTML scrsetu pro picture.
      * @param Palette $palette
-     * @param PictureUrl $pictureUrl
+     * @param SourcePicture $sourcePicture
      * @return string
      * @throws Exception
      */
-    public static function generatePictureSrcSetHtml(Palette $palette, PictureUrl $pictureUrl): string
+    public static function generatePictureSrcSetHtml(Palette $palette, SourcePicture $sourcePicture): string
     {
         $scrSets = [];
 
         // Zjistíme mimeType obrázku.
-        $pictureMimeType = self::getPictureMimeType($pictureUrl->getPicture());
+        $pictureMimeType = self::getPictureMimeType($sourcePicture->getPicture());
 
         // Vygenerování scrsetu mířící na výchozí obrázek pro prohlížeče, podporující tag picture.
         if ($pictureMimeType)
         {
             $scrSets[] = sprintf(
                 '<source srcset="%s" type="%s">' . "\n",
-                $pictureUrl->getPictureUrl(), // Tento obrázek je stejný s obrázkem, který se vypisuje do img tagu.
+                $sourcePicture->getPictureUrl(), // Tento obrázek je stejný s obrázkem, který se vypisuje do img tagu.
                 $pictureMimeType
             );
         }
 
         // Vygenerování scrsetu mířící na obrázek ve formátu webP pro prohlížeče, podporující tag a WebP.
-        if ($pictureMimeType !== 'image/webp' && !$pictureUrl->getPicture()->isWebp())
+        if ($pictureMimeType !== 'image/webp' && !$sourcePicture->getPicture()->isWebp())
         {
             $scrSets[] = sprintf(
                 '<source srcset="%s" type="image/webp">' . "\n",
                 $palette->getUrl(
-                    $pictureUrl->getImage(),
+                    $sourcePicture->getImage(),
                     // Do palette query přidáme transformaci na WebP včetně definice quality.
-                    $pictureUrl->getImageQuery() . '&WebP&Quality;' . $palette->getWebpMacroDefaultQuality())
+                    $sourcePicture->getImageQuery() . '&WebP&Quality;' . $palette->getWebpMacroDefaultQuality())
             );
         }
 

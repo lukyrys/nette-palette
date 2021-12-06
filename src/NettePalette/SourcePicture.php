@@ -5,10 +5,10 @@ namespace NettePalette;
 use Palette\Picture;
 
 /**
- * Class PictureUrl
+ * Class SourcePicture
  * @package NettePalette
  */
-final class PictureUrl
+final class SourcePicture
 {
     /** @var string */
     private $image;
@@ -24,7 +24,7 @@ final class PictureUrl
 
 
     /**
-     * PictureUrl constructor.
+     * SourcePicture constructor.
      * @param string $image
      * @param string $imageQuery
      * @param Picture $picture

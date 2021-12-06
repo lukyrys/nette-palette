@@ -14,6 +14,7 @@
 namespace NettePalette\Latte;
 
 use NettePalette\Palette;
+use Palette\Exception;
 
 /**
  * Providing Palette support to Latte template engine
@@ -41,6 +42,7 @@ final class LatteFilter
      * @param string $image
      * @param string|null $imageQuery
      * @return string|null
+     * @throws Exception
      */
     public function __invoke(string $image, ?string $imageQuery = NULL): ?string
     {

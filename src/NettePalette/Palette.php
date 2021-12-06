@@ -207,10 +207,10 @@ class Palette
      * @param bool $forMacro
      * @param string $image
      * @param string $imageQuery
-     * @return PictureUrl
+     * @return SourcePicture
      * @throws Exception
      */
-    public function getPictureUrl(bool $forMacro, string $image, string $imageQuery): PictureUrl
+    public function getSourcePicture(bool $forMacro, string $image, string $imageQuery): SourcePicture
     {
         // Validace URL a načtení palette picture.
         $url = $this->getUrl($image, $imageQuery, $picture);
@@ -238,7 +238,7 @@ class Palette
         }
 
         // Sestavíme DTO obrázku.
-        return new PictureUrl(
+        return new SourcePicture(
             $image,
             $imageQuery,
             $picture,
