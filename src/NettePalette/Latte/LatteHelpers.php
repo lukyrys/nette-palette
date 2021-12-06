@@ -40,12 +40,13 @@ final class LatteHelpers
 
     /**
      * Vygeneruje HTML scrsetu pro picture.
+     * @param int|null $quality
      * @param Palette $palette
      * @param SourcePicture $sourcePicture
      * @return string
      * @throws Exception
      */
-    public static function generatePictureSrcSetHtml(Palette $palette, SourcePicture $sourcePicture): string
+    public static function generatePictureSrcSetHtml(?int $quality, Palette $palette, SourcePicture $sourcePicture): string
     {
         $scrSets = [];
 
@@ -70,7 +71,8 @@ final class LatteHelpers
                 $palette->getUrl(
                     $sourcePicture->getImage(),
                     // Do palette query přidáme transformaci na WebP včetně definice quality.
-                    $sourcePicture->getImageQuery() . '&WebP&Quality;' . $palette->getWebpMacroDefaultQuality())
+                    $sourcePicture->getImageQuery() . '&WebP&Quality;' . ($quality ?? $palette->getWebpMacroDefaultQuality())
+                )
             );
         }
 

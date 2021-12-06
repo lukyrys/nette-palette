@@ -205,12 +205,13 @@ class Palette
     /**
      * Vrací informace o obrázku a jeho URL.
      * @param bool $forMacro
+     * @param int|null $quality
      * @param string $image
      * @param string $imageQuery
      * @return SourcePicture
      * @throws Exception
      */
-    public function getSourcePicture(bool $forMacro, string $image, string $imageQuery): SourcePicture
+    public function getSourcePicture(bool $forMacro, ?int $quality, string $image, string $imageQuery): SourcePicture
     {
         // Validace URL a načtení palette picture.
         $url = $this->getUrl($image, $imageQuery, $picture);
@@ -225,7 +226,7 @@ class Palette
         /** @var Picture $picture */
         if ($forMacro && ($picture->isWebp() || LatteHelpers::getPictureMimeType($picture) === 'image/webp'))
         {
-            $imageQuery.= '&Quality;' . $this->getWebpMacroDefaultQuality();
+            $imageQuery.= '&Quality;' . ($quality ?? $this->getWebpMacroDefaultQuality());
 
             $picture = null;
 

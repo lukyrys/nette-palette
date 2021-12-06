@@ -23,6 +23,9 @@ final class LatteMacroSet extends MacroSet
     /** @var bool byl definován zdrojový obrázek picture setu? */
     private $isPictureSrcSet = false;
 
+    /** @var int<1, 100>|null přetížení výchozí kvality WebP obrázků. */
+    private $macroWebPQuality = null;
+
 
     /**
      * Provede instalaci palette maker do Latte compileru.
@@ -46,11 +49,26 @@ final class LatteMacroSet extends MacroSet
      * @param MacroNode $node
      * @param PhpWriter $writer
      * @return string
+     * @throws CompileException
      */
     public function macroWebpOpen(MacroNode $node, PhpWriter $writer): string
     {
         $this->isInPicture = true;
         $this->isPictureSrcSet = false;
+        $this->macroWebPQuality = null;
+
+        // Načteme a zvalidujeme vlastní definici kvality WebP obrázků v makru.
+        $quality = $node->tokenizer->fetchWord();
+
+        if ($quality !== null)
+        {
+            if ((int) $quality <= 0 || (int) $quality > 100 || !Validators::isNumericInt($quality))
+            {
+                throw new CompileException('Quality of must be int<1, 100>|null in ' . $node->getNotation());
+            }
+
+            $this->macroWebPQuality = (int) $quality;
+        }
 
         return '';
     }
@@ -74,7 +92,8 @@ final class LatteMacroSet extends MacroSet
 
         //// Vygenerování source setů přes palette.
         $node->innerContent .= $writer->write(
-            '<?php echo NettePalette\Latte\LatteHelpers::generatePictureSrcSetHtml($this->global->palette, $__paletteSourcePicture); unset($__paletteSourcePicture); ?>'
+            '<?php echo NettePalette\Latte\LatteHelpers::generatePictureSrcSetHtml(%var, $this->global->palette, $__paletteSourcePicture); unset($__paletteSourcePicture); ?>',
+            $this->macroWebPQuality
         );
 
         return '';
@@ -108,7 +127,10 @@ final class LatteMacroSet extends MacroSet
         // Vygenerujeme PHP/HTML kód img tagu s fallbackem picture setu.
         return
             ' ?> src="<?php ' .
-            $writer->write('$__paletteSourcePicture=$this->global->palette->getSourcePicture(true, %node.args); echo $__paletteSourcePicture->getPictureUrl(); ') .
+            $writer->write(
+                '$__paletteSourcePicture=$this->global->palette->getSourcePicture(true, %var, %node.args); echo $__paletteSourcePicture->getPictureUrl(); ',
+                $this->macroWebPQuality
+            ) .
             '?>"<?php ';
     }
 }
