@@ -53,16 +53,6 @@ final class LatteHelpers
         // Zjistíme mimeType obrázku.
         $pictureMimeType = self::getPictureMimeType($sourcePicture->getPicture());
 
-        // Vygenerování scrsetu mířící na výchozí obrázek pro prohlížeče, podporující tag picture.
-        if ($pictureMimeType)
-        {
-            $scrSets[] = sprintf(
-                '<source srcset="%s" type="%s">' . "\n",
-                $sourcePicture->getPictureUrl(), // Tento obrázek je stejný s obrázkem, který se vypisuje do img tagu.
-                $pictureMimeType
-            );
-        }
-
         // Vygenerování scrsetu mířící na obrázek ve formátu webP pro prohlížeče, podporující tag a WebP.
         if ($pictureMimeType !== 'image/webp' && !$sourcePicture->getPicture()->isWebp())
         {
@@ -73,6 +63,16 @@ final class LatteHelpers
                     // Do palette query přidáme transformaci na WebP včetně definice quality.
                     $sourcePicture->getImageQuery() . '&WebP&Quality;' . ($quality ?? $palette->getWebpMacroDefaultQuality())
                 )
+            );
+        }
+
+        // Vygenerování scrsetu mířící na výchozí obrázek pro prohlížeče, podporující tag picture.
+        if ($pictureMimeType)
+        {
+            $scrSets[] = sprintf(
+                '<source srcset="%s" type="%s">' . "\n",
+                $sourcePicture->getPictureUrl(), // Tento obrázek je stejný s obrázkem, který se vypisuje do img tagu.
+                $pictureMimeType
             );
         }
 
