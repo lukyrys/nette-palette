@@ -6,6 +6,7 @@
 {var $imageGif = realpath('../images/portrait.gif')}
 {var $imageWebp = realpath('../images/portrait.webp')}
 
+{* Příklady použití n:webp a n:picture-src. *}
 <div>JPG</div>
 <picture n:webp>
     <img n:picture-src="$imageJpg, '300;300;fit'" alt="Image" />
@@ -28,7 +29,7 @@
 
 <div>Converted to WebP</div>
 <picture n:webp>
-    <img n:picture-src="$imageJpg, '300;300;fit'" alt="Image" />
+    <img n:picture-src="$imageJpg, '300;300;fit&WebP'" alt="Image" />
 </picture>
 
 <div>JPG - Custom WebP quality (1–100)</div>
@@ -43,5 +44,5 @@
 
 <div>Converted to WebP - Custom WebP quality (1–100)</div>
 <picture n:webp="10">
-    <img n:picture-src="$imageJpg, '300;300;fit'" alt="Image" />
+    <img n:picture-src="$imageJpg, '300;300;fit&WebP'" alt="Image" />
 </picture>
