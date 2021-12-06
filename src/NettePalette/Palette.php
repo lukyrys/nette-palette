@@ -13,6 +13,7 @@
 
 namespace NettePalette;
 
+use NettePalette\Latte\LatteHelpers;
 use Tracy\Debugger;
 use Palette\Picture;
 use Palette\Exception;
@@ -44,6 +45,9 @@ class Palette
      * string = only exception messages are begin logged to specified log file via Tracy\Debugger
      */
     protected $handleExceptions = TRUE;
+
+    /** @var int nastavení výchozí kvality webp obrázků pro makro n:webp. */
+    protected $webpMacroDefaultQuality = 100;
 
 
     /**
@@ -101,6 +105,33 @@ class Palette
         {
             $this->generator->setPictureLoader($pictureLoader);
         }
+    }
+
+
+    /**
+     * Nastavení výchozí kvality WebP obrázků, které se generují přes makro n:webp.
+     * @param int $webpQuality
+     * @return void
+     * @throws Exception
+     */
+    public function setWebpMacroDefaultQuality(int $webpQuality): void
+    {
+        if ($webpQuality <= 0 || $webpQuality > 100)
+        {
+            throw new Exception('WebpMacroDefaultQuality must be int<1, 100>.');
+        }
+
+        $this->webpMacroDefaultQuality = $webpQuality;
+    }
+
+
+    /**
+     * Vrací výchozí kvalitu WebP obrázků, které se generují přes makro n:webp.
+     * @return int
+     */
+    public function getWebpMacroDefaultQuality(): int
+    {
+        return $this->webpMacroDefaultQuality;
     }
 
 
@@ -173,13 +204,15 @@ class Palette
 
     /**
      * Vrací informace o obrázku a jeho URL.
+     * @param bool $forMacro
      * @param string $image
      * @param string $imageQuery
      * @return PictureUrl
      * @throws Exception
      */
-    public function getPictureUrl(string $image, string $imageQuery): PictureUrl
+    public function getPictureUrl(bool $forMacro, string $image, string $imageQuery): PictureUrl
     {
+        // Validace URL a načtení palette picture.
         $url = $this->getUrl($image, $imageQuery, $picture);
 
         if (!$url || !$picture)
@@ -187,6 +220,24 @@ class Palette
             throw new Exception('Generate URL failed.');
         }
 
+        // Pokud je obrázek WebP a generujeme URL pro makro aplikujeme na něj také výchozí nastavení kvality.
+        // (jedná se o nouzový fallback)
+        /** @var Picture $picture */
+        if ($forMacro && ($picture->isWebp() || LatteHelpers::getPictureMimeType($picture) === 'image/webp'))
+        {
+            $imageQuery.= '&Quality;' . $this->getWebpMacroDefaultQuality();
+
+            $picture = null;
+
+            $url = $this->getUrl($image, $imageQuery, $picture);
+
+            if (!$url || !$picture)
+            {
+                throw new Exception('Generate URL in WebP fallback failed.');
+            }
+        }
+
+        // Sestavíme DTO obrázku.
         return new PictureUrl(
             $image,
             $imageQuery,

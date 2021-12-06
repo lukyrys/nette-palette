@@ -73,6 +73,12 @@ class PaletteExtension extends CompilerExtension
                 $config['handleException'] ?? TRUE,
             ]);
 
+        // Nastavení výchozí kvality webp obrázků, které generuje makro n:webp.
+        if (isset($config['webpMacroDefaultQuality']))
+        {
+            $paletteService->addSetup('setWebpMacroDefaultQuality', [$config['webpMacroDefaultQuality']]);
+        }
+
         // Zaregistrování služby Latte filtru.
         $builder
             ->addDefinition($this->prefix('filter'))

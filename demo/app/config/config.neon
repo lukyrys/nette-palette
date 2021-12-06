@@ -17,6 +17,7 @@ palette:
     url: %paletteThumbsUrl%
     basepath: '/var/www/html/demo/www/'
     signingKey: 'HOfU2RTxbimmaYmAnrQ1'
+    webpMacroDefaultQuality: 80
 
 session:
 	expiration: 14 days

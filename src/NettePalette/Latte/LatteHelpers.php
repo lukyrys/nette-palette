@@ -67,7 +67,10 @@ final class LatteHelpers
         {
             $scrSets[] = sprintf(
                 '<source srcset="%s" type="image/webp">' . "\n",
-                $palette->getUrl($pictureUrl->getImage(), $pictureUrl->getImageQuery() . '&WebP') // Do palette query přidáme transformaci na WebP.
+                $palette->getUrl(
+                    $pictureUrl->getImage(),
+                    // Do palette query přidáme transformaci na WebP včetně definice quality.
+                    $pictureUrl->getImageQuery() . '&WebP&Quality;' . $palette->getWebpMacroDefaultQuality())
             );
         }
 
