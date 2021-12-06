@@ -1,6 +1,33 @@
 {block content}
-Palette DemoApp. <br />
 
-{var $image = realpath('../images/portrait.jpg')}
+{* Definice testovacích obrázků palette. *}
+{var $imageJpg = realpath('../images/portrait.jpg')}
+{var $imagePng = realpath('../images/portrait.png')}
+{var $imageGif = realpath('../images/portrait.gif')}
+{var $imageWebp = realpath('../images/portrait.webp')}
 
-<img src="{$image|palette:'100;100'}" alt="Palette" />
+<div>JPG</div>
+<picture n:webp>
+    <img n:picture-src="$imageJpg, '100;100;exact'" alt="Image" />
+</picture>
+
+<div>PNG</div>
+<picture n:webp>
+    <img n:picture-src="$imagePng, '100;100;exact'" alt="Image" />
+</picture>
+
+<div>GIF</div>
+<picture n:webp>
+    <img n:picture-src="$imageGif, '100;100;exact'" alt="Image" />
+</picture>
+
+<div>WebP</div>
+<picture n:webp>
+    <img n:picture-src="$imageWebp, '100;100;exact'" alt="Image" />
+</picture>
+
+<div>Converted to WebP</div>
+<picture n:webp>
+    <img n:picture-src="$imageJpg, '100;100;exact&WebP'" alt="Image" />
+</picture>
+

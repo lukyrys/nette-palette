@@ -127,9 +127,9 @@ class Palette
 
     /**
      * Get absolute url to image with specified image query string
-     * @param $image
+     * @param string $image
      * @return null|string
-     * @throws
+     * @throws Exception
      */
     public function __invoke(string $image): ?string
     {
@@ -142,9 +142,11 @@ class Palette
      * Supports absolute picture url when is relative generator url set
      * @param string $image
      * @param string|null $imageQuery
+     * @param Picture|null $picture
      * @return null|string
+     * @throws Exception
      */
-    public function getUrl(string $image, ?string $imageQuery = NULL): ?string
+    public function getUrl(string $image, ?string $imageQuery = NULL, Picture &$picture = null): ?string
     {
         // Experimental support for absolute picture url when is relative generator url set
         if($imageQuery && Strings::startsWith($imageQuery, '//'))
@@ -165,7 +167,32 @@ class Palette
             return $imageUrl;
         }
 
-        return $this->getPictureGeneratorUrl($image, $imageQuery);
+        return $this->getPictureGeneratorUrl($image, $imageQuery, $picture);
+    }
+
+
+    /**
+     * Vrací informace o obrázku a jeho URL.
+     * @param string $image
+     * @param string $imageQuery
+     * @return PictureUrl
+     * @throws Exception
+     */
+    public function getPictureUrl(string $image, string $imageQuery): PictureUrl
+    {
+        $url = $this->getUrl($image, $imageQuery, $picture);
+
+        if (!$url || !$picture)
+        {
+            throw new Exception('Generate URL failed.');
+        }
+
+        return new PictureUrl(
+            $image,
+            $imageQuery,
+            $picture,
+            $url
+        );
     }
 
 
@@ -173,17 +200,20 @@ class Palette
      * Get url to image with specified image query string from generator
      * @param $image
      * @param null $imageQuery
+     * @param Picture|null $picture
      * @return null|string
-     * @throws
+     * @throws Exception
      */
-    protected function getPictureGeneratorUrl($image, $imageQuery = NULL): ?string
+    protected function getPictureGeneratorUrl($image, $imageQuery = NULL, Picture &$picture = null): ?string
     {
         if($imageQuery !== NULL)
         {
             $image .= '@' . $imageQuery;
         }
 
-        return $this->generator->loadPicture($image)->getUrl();
+        $picture = $this->generator->loadPicture($image);
+
+        return $picture->getUrl();
     }
 
 

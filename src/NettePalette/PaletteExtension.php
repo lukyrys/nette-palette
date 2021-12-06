@@ -18,6 +18,7 @@ use Nette\DI\Definitions\Definition;
 use Nette\DI\ServiceCreationException;
 use Nette\DI\Definitions\ServiceDefinition;
 use Nette\DI\Definitions\FactoryDefinition;
+use NettePalette\Latte\LatteFilter;
 
 /**
  * Palette Extension for Nette Framework
@@ -33,7 +34,7 @@ class PaletteExtension extends CompilerExtension
      */
     public function loadConfiguration(): void
     {
-        // Load extension configuration
+        // Načtení a validace konfigurace rozšíření.
         $config = $this->getConfig();
 
         if(!isset($config['path']))
@@ -51,59 +52,65 @@ class PaletteExtension extends CompilerExtension
             throw new ServiceCreationException('Missing required parameter signingKey in PaletteExtension configuration');
         }
 
-        // Register extension services
+        //// Zaregistrování palette služeb.
         $builder = $this->getContainerBuilder();
 
-        // Register palette service
-        $builder->addDefinition($this->prefix('service'))
-                ->setType(Palette::class)
-                ->setArguments([
+        // Zaregistrování Nette služby Palette.
+        $paletteService = $builder
+            ->addDefinition($this->prefix('service'))
+            ->setType(Palette::class)
+            ->setArguments([
+                $config['path'],
+                $config['url'],
+                empty($config['basepath']) ? NULL : $config['basepath'],
+                $config['signingKey'],
+                empty($config['fallbackImage']) ? NULL : $config['fallbackImage'],
+                empty($config['template']) ? NULL : $config['template'],
+                empty($config['websiteUrl']) ? NULL : $config['websiteUrl'],
+                empty($config['pictureLoader']) ? NULL : $config['pictureLoader'],
+            ])
+            ->addSetup('setHandleExceptions', [
+                $config['handleException'] ?? TRUE,
+            ]);
 
-                    $config['path'],
-                    $config['url'],
-                    empty($config['basepath']) ? NULL : $config['basepath'],
-                    $config['signingKey'],
-                    empty($config['fallbackImage']) ? NULL : $config['fallbackImage'],
-                    empty($config['template']) ? NULL : $config['template'],
-                    empty($config['websiteUrl']) ? NULL : $config['websiteUrl'],
-                    empty($config['pictureLoader']) ? NULL : $config['pictureLoader'],
-                ])
-                ->addSetup('setHandleExceptions', [
+        // Zaregistrování služby Latte filtru.
+        $builder
+            ->addDefinition($this->prefix('filter'))
+            ->setType(LatteFilter::class)
+            ->setArguments([$this->prefix('@service')]);
 
-                    $config['handleException'] ?? TRUE,
-                ]);
-
-        // Register latte filter service
-        $builder->addDefinition($this->prefix('filter'))
-                ->setType(LatteFilter::class)
-                ->setArguments([$this->prefix('@service')]);
-
-        // Register latte filter
+        //// Zaregistrování filtrů a maker do Latte.
         $latteService = $this->getLatteService();
+        $latteService
+            ->addSetup('?->addProvider(?, ?)', ['@self', 'palette', $paletteService])
+            ->addSetup('?->onCompile[] = function ($engine) { NettePalette\Latte\LatteMacroSet::install($engine->getCompiler()); }', ['@self'])
+            ->addSetup('addFilter', ['palette', $this->prefix('@filter')]);
 
-        if($latteService instanceof FactoryDefinition)
-        {
-            $latteService = $latteService->getResultDefinition();
-        }
-
-        $latteService->addSetup('addFilter', ['palette', $this->prefix('@filter')]);
-
-        // Register extension presenter
-        $builder->getDefinition('nette.presenterFactory')
-                ->addSetup('setMapping', [['Palette' => 'NettePalette\*Presenter']]);
+        //// Zaregistrování vlastního mapování pro PalettePresenter.
+        //// (v budoucnu bude nahrazeno za Application->onStartup[])
+        $builder
+            ->getDefinition('nette.presenterFactory')
+            ->addSetup('setMapping', [['Palette' => 'NettePalette\*Presenter']]);
     }
 
 
     /**
      * Get Latte service definition
-     * @return ServiceDefinition|FactoryDefinition
+     * @return Definition|ServiceDefinition
      */
     protected function getLatteService(): Definition
     {
         $builder = $this->getContainerBuilder();
 
-        return $builder->hasDefinition('nette.latteFactory')
+        $service = $builder->hasDefinition('nette.latteFactory')
             ? $builder->getDefinition('nette.latteFactory')
             : $builder->getDefinition('nette.latte');
+
+        if($service instanceof FactoryDefinition)
+        {
+            return $service->getResultDefinition();
+        }
+
+        return $service;
     }
 }
