@@ -70,12 +70,14 @@ final class LatteMacroSet extends MacroSet
 
         if ($quality !== null)
         {
-            if ((int) $quality <= 0 || (int) $quality > 100 || !Validators::isNumericInt($quality))
+            $intQuality = (int) $quality;
+
+            if ($intQuality <= 0 || $intQuality > 100 || !Validators::isNumericInt($quality))
             {
                 throw new CompileException('Quality of must be int<1, 100>|null in ' . $node->getNotation());
             }
 
-            $this->macroWebPQuality = (int) $quality;
+            $this->macroWebPQuality = $intQuality;
         }
 
         return '';

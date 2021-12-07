@@ -15,6 +15,7 @@ namespace NettePalette;
 
 use Nette\Application\UI\Presenter;
 use Nette\DI\Container;
+use Throwable;
 
 /**
  * Palette Presenter for on demand generation images with palette
@@ -41,11 +42,12 @@ class PalettePresenter extends Presenter
 
     /**
      * Palette images backend endpoint.
-     * @throws
+     * @return void
+     * @throws Throwable
      */
     public function actionImage(): void
     {
-        /** @var $palette Palette */
+        /** @var Palette $palette */
         $palette = $this->container->getService('palette.service');
         $palette->serverResponse();
 

@@ -14,6 +14,7 @@
 namespace NettePalette;
 
 use NettePalette\Latte\LatteHelpers;
+use Throwable;
 use Tracy\Debugger;
 use Palette\Picture;
 use Palette\Exception;
@@ -54,13 +55,13 @@ class Palette
      * Palette constructor.
      * @param string $storagePath absolute or relative path to generated thumbs (and pictures) directory
      * @param string $storageUrl absolute live url to generated thumbs (and pictures) directory
-     * @param null|string $basePath absolute path to website root directory
+     * @param string|null $basePath absolute path to website root directory
      * @param string $signingKey
-     * @param null|string $fallbackImage absolute or relative path to default image.
-     * @param null $templates palette image query templates
-     * @param null|string $websiteUrl
-     * @param IPictureLoader|NULL $pictureLoader
-     * @throws
+     * @param string|null $fallbackImage absolute or relative path to default image.
+     * @param array<string, string>|null $templates palette image query templates
+     * @param string|null $websiteUrl
+     * @param IPictureLoader|null $pictureLoader
+     * @throws Exception
      */
     public function __construct(
         string $storagePath,
@@ -140,7 +141,7 @@ class Palette
      * FALSE = exceptions are thrown
      * TRUE = exceptions are begin detailed logged via Tracy\Debugger
      * string = only exception messages are begin logged to specified log file via Tracy\Debugger
-     * @param $handleExceptions
+     * @param bool|string $handleExceptions
      * @throws Exception
      */
     public function setHandleExceptions($handleExceptions): void
@@ -159,7 +160,7 @@ class Palette
     /**
      * Get absolute url to image with specified image query string
      * @param string $image
-     * @return null|string
+     * @return string|null
      * @throws Exception
      */
     public function __invoke(string $image): ?string
@@ -250,8 +251,8 @@ class Palette
 
     /**
      * Get url to image with specified image query string from generator
-     * @param $image
-     * @param null $imageQuery
+     * @param string $image
+     * @param string|null $imageQuery
      * @param Picture|null $picture
      * @return null|string
      * @throws Exception
@@ -271,9 +272,9 @@ class Palette
 
     /**
      * Get Palette picture instance
-     * @param $image
+     * @param string $image
      * @return Picture
-     * @throws
+     * @throws Exception
      */
     public function getPicture($image): Picture
     {
@@ -293,7 +294,7 @@ class Palette
 
     /**
      * Execute palette service generator backend
-     * @throws
+     * @throws Throwable
      */
     public function serverResponse(): void
     {
@@ -338,6 +339,7 @@ class Palette
 
             if($fallbackImage)
             {
+                /** @var string $paletteQuery */
                 $paletteQuery = preg_replace('/.*@(.*)/', $fallbackImage . '@$1', $requestImageQuery);
 
                 $picture  = $this->generator->loadPicture($paletteQuery);

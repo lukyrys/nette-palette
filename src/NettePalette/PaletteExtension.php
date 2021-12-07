@@ -35,6 +35,7 @@ class PaletteExtension extends CompilerExtension
     public function loadConfiguration(): void
     {
         // Načtení a validace konfigurace rozšíření.
+        /** @var array<string, int|string|bool|null> $config */
         $config = $this->getConfig();
 
         if(!isset($config['path']))
@@ -94,20 +95,28 @@ class PaletteExtension extends CompilerExtension
 
         //// Zaregistrování vlastního mapování pro PalettePresenter.
         //// (v budoucnu bude nahrazeno za Application->onStartup[])
-        $builder
-            ->getDefinition('nette.presenterFactory')
+        /** @var FactoryDefinition|ServiceDefinition $presenterFactory */
+        $presenterFactory = $builder->getDefinition('nette.presenterFactory');
+
+        if($presenterFactory instanceof FactoryDefinition)
+        {
+            $presenterFactory = $presenterFactory->getResultDefinition();
+        }
+
+        $presenterFactory
             ->addSetup('setMapping', [['Palette' => 'NettePalette\*Presenter']]);
     }
 
 
     /**
      * Get Latte service definition
-     * @return Definition|ServiceDefinition
+     * @return ServiceDefinition
      */
     protected function getLatteService(): Definition
     {
         $builder = $this->getContainerBuilder();
 
+        /** @var ServiceDefinition|FactoryDefinition $service */
         $service = $builder->hasDefinition('nette.latteFactory')
             ? $builder->getDefinition('nette.latteFactory')
             : $builder->getDefinition('nette.latte');
