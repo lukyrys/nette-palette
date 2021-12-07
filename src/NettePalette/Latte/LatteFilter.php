@@ -11,14 +11,17 @@
  * @copyright 2016
  */
 
-namespace NettePalette;
+namespace NettePalette\Latte;
+
+use NettePalette\Palette;
+use Palette\Exception;
 
 /**
  * Providing Palette support to Latte template engine
  * Class LatteFilter
- * @package NettePalette
+ * @package NettePalette\Latte
  */
-class LatteFilter
+final class LatteFilter
 {
     /** @var Palette service */
     private $palette;
@@ -39,6 +42,7 @@ class LatteFilter
      * @param string $image
      * @param string|null $imageQuery
      * @return string|null
+     * @throws Exception
      */
     public function __invoke(string $image, ?string $imageQuery = NULL): ?string
     {

@@ -13,6 +13,8 @@
 
 namespace NettePalette;
 
+use NettePalette\Latte\LatteHelpers;
+use Throwable;
 use Tracy\Debugger;
 use Palette\Picture;
 use Palette\Exception;
@@ -45,18 +47,21 @@ class Palette
      */
     protected $handleExceptions = TRUE;
 
+    /** @var int nastavení výchozí kvality webp obrázků pro makro n:webp. */
+    protected $webpMacroDefaultQuality = 100;
+
 
     /**
      * Palette constructor.
      * @param string $storagePath absolute or relative path to generated thumbs (and pictures) directory
      * @param string $storageUrl absolute live url to generated thumbs (and pictures) directory
-     * @param null|string $basePath absolute path to website root directory
+     * @param string|null $basePath absolute path to website root directory
      * @param string $signingKey
-     * @param null|string $fallbackImage absolute or relative path to default image.
-     * @param null $templates palette image query templates
-     * @param null|string $websiteUrl
-     * @param IPictureLoader|NULL $pictureLoader
-     * @throws
+     * @param string|null $fallbackImage absolute or relative path to default image.
+     * @param array<string, string>|null $templates palette image query templates
+     * @param string|null $websiteUrl
+     * @param IPictureLoader|null $pictureLoader
+     * @throws Exception
      */
     public function __construct(
         string $storagePath,
@@ -105,11 +110,38 @@ class Palette
 
 
     /**
+     * Nastavení výchozí kvality WebP obrázků, které se generují přes makro n:webp.
+     * @param int $webpQuality
+     * @return void
+     * @throws Exception
+     */
+    public function setWebpMacroDefaultQuality(int $webpQuality): void
+    {
+        if ($webpQuality <= 0 || $webpQuality > 100)
+        {
+            throw new Exception('WebpMacroDefaultQuality must be int<1, 100>.');
+        }
+
+        $this->webpMacroDefaultQuality = $webpQuality;
+    }
+
+
+    /**
+     * Vrací výchozí kvalitu WebP obrázků, které se generují přes makro n:webp.
+     * @return int
+     */
+    public function getWebpMacroDefaultQuality(): int
+    {
+        return $this->webpMacroDefaultQuality;
+    }
+
+
+    /**
      * Set generator exceptions handling (image generation via url link)
      * FALSE = exceptions are thrown
      * TRUE = exceptions are begin detailed logged via Tracy\Debugger
      * string = only exception messages are begin logged to specified log file via Tracy\Debugger
-     * @param $handleExceptions
+     * @param bool|string $handleExceptions
      * @throws Exception
      */
     public function setHandleExceptions($handleExceptions): void
@@ -127,9 +159,9 @@ class Palette
 
     /**
      * Get absolute url to image with specified image query string
-     * @param $image
-     * @return null|string
-     * @throws
+     * @param string $image
+     * @return string|null
+     * @throws Exception
      */
     public function __invoke(string $image): ?string
     {
@@ -142,9 +174,11 @@ class Palette
      * Supports absolute picture url when is relative generator url set
      * @param string $image
      * @param string|null $imageQuery
+     * @param Picture|null $picture
      * @return null|string
+     * @throws Exception
      */
-    public function getUrl(string $image, ?string $imageQuery = NULL): ?string
+    public function getUrl(string $image, ?string $imageQuery = NULL, Picture &$picture = null): ?string
     {
         // Experimental support for absolute picture url when is relative generator url set
         if($imageQuery && Strings::startsWith($imageQuery, '//'))
@@ -165,33 +199,82 @@ class Palette
             return $imageUrl;
         }
 
-        return $this->getPictureGeneratorUrl($image, $imageQuery);
+        return $this->getPictureGeneratorUrl($image, $imageQuery, $picture);
+    }
+
+
+    /**
+     * Vrací informace o obrázku a jeho URL.
+     * @param bool $forMacro
+     * @param int|null $quality
+     * @param string $image
+     * @param string $imageQuery
+     * @return SourcePicture
+     * @throws Exception
+     */
+    public function getSourcePicture(bool $forMacro, ?int $quality, string $image, string $imageQuery): SourcePicture
+    {
+        // Validace URL a načtení palette picture.
+        $url = $this->getUrl($image, $imageQuery, $picture);
+
+        if (!$url || !$picture)
+        {
+            throw new Exception('Generate URL failed.');
+        }
+
+        // Pokud je obrázek WebP a generujeme URL pro makro aplikujeme na něj také výchozí nastavení kvality.
+        // (jedná se o nouzový fallback)
+        /** @var Picture $picture */
+        if ($forMacro && ($picture->isWebp() || LatteHelpers::getPictureMimeType($picture) === 'image/webp'))
+        {
+            $imageQuery.= '&Quality;' . ($quality ?? $this->getWebpMacroDefaultQuality());
+
+            $picture = null;
+
+            $url = $this->getUrl($image, $imageQuery, $picture);
+
+            if (!$url || !$picture)
+            {
+                throw new Exception('Generate URL in WebP fallback failed.');
+            }
+        }
+
+        // Sestavíme DTO obrázku.
+        return new SourcePicture(
+            $image,
+            $imageQuery,
+            $picture,
+            $url
+        );
     }
 
 
     /**
      * Get url to image with specified image query string from generator
-     * @param $image
-     * @param null $imageQuery
+     * @param string $image
+     * @param string|null $imageQuery
+     * @param Picture|null $picture
      * @return null|string
-     * @throws
+     * @throws Exception
      */
-    protected function getPictureGeneratorUrl($image, $imageQuery = NULL): ?string
+    protected function getPictureGeneratorUrl($image, $imageQuery = NULL, Picture &$picture = null): ?string
     {
         if($imageQuery !== NULL)
         {
             $image .= '@' . $imageQuery;
         }
 
-        return $this->generator->loadPicture($image)->getUrl();
+        $picture = $this->generator->loadPicture($image);
+
+        return $picture->getUrl();
     }
 
 
     /**
      * Get Palette picture instance
-     * @param $image
+     * @param string $image
      * @return Picture
-     * @throws
+     * @throws Exception
      */
     public function getPicture($image): Picture
     {
@@ -211,7 +294,7 @@ class Palette
 
     /**
      * Execute palette service generator backend
-     * @throws
+     * @throws Throwable
      */
     public function serverResponse(): void
     {
@@ -256,6 +339,7 @@ class Palette
 
             if($fallbackImage)
             {
+                /** @var string $paletteQuery */
                 $paletteQuery = preg_replace('/.*@(.*)/', $fallbackImage . '@$1', $requestImageQuery);
 
                 $picture  = $this->generator->loadPicture($paletteQuery);
