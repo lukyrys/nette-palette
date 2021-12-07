@@ -25,6 +25,11 @@ Palette u obrázků například umožňuje: změny rozměrů, vkládání vodozn
 - **url:** Absolutní url adresa s lomítkem na konci na které je složka s miniatury veřejně dostupná.
 - **signingKey:** Náhodný řetězec, kterým se podepisují (http) požadavky na generování miniatur.
 - **basepath:** *(nepovinný)* Absolutní cesta k document rootu webu.
+- **fallbackImage:** *(nepovinný)* Absolutní cesta k obrázku, který se použije v případě, že požadovaný obrázek neexistuje (užitečné hlavně pro DEV).
+- **template:** *(nepovinný)* Pole šablon ve tvaru `název šablony` => `paletteQuery`. Šablony je možné používat v palette query přes `.` např.: `.template`.
+- **websiteUrl:** *(nepovinný)* Adresa aplikace s lomítkem na konci pro generování absolutních url adres k obrázkům v cli (např.: `https://localhost/`).
+- **pictureLoader:** *(nepovinný)* Služba implementující interface `IPictureLoader`, přes kterou je možné upravit logiku načítání a generování obrázků přes Palette.
+- **handleException:** *(nepovinný)* Jak se má pracovat s výjímkami při generování obrázků? true *(default)* - výjímky se logují přes tracy, false - výjímky se vyhazují, string - výjímky se logují do souboru přes tracy.
 - **webpMacroDefaultQuality:** *(nepovinný)* Definice výchozí kvality (1–100) WebP obrázků pro makro n:webp. Pokud není zadáno, použije se `100`.
 
 #### 4.  A na konec do routovacích pravidel aplikace přidat na první místo toto pravidlo:
@@ -77,7 +82,7 @@ Pomocí tohoto makra je možné vygenerovat picture set obrázků, kde jako prvn
 verze obrázu ve formátu WebP s fallbackem na původní formát souboru (jpg|png|gif).
 Makro je možné použít pouze HTML tagu `<picture>`.  
 
-Uvitř tagu picture musí být zadán jeden tag img s definicí zdrojového obrázku setu
+Uvnitř tagu picture musí být zadán jeden tag `img` s definicí zdrojového obrázku setu
 přes makro `n:picture-src`  
 (argumenty tohoto makra jsou shodné s makrem n:palette-src).  
 
