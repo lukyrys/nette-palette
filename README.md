@@ -79,7 +79,7 @@ _________________
 
 #### Makro n:webp
 Pomocí tohoto makra je možné vygenerovat picture set obrázků, kde jako první verze bude 
-verze obrázu ve formátu WebP s fallbackem na původní formát souboru (jpg|png|gif).
+verze obrázku ve formátu WebP s fallbackem na původní formát souboru (jpg|png|gif).
 Makro je možné použít pouze HTML tagu `<picture>`.  
 
 Uvnitř tagu picture musí být zadán jeden tag `img` s definicí zdrojového obrázku setu
