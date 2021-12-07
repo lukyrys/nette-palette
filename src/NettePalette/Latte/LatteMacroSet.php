@@ -42,7 +42,7 @@ final class LatteMacroSet extends MacroSet
         $me->addMacro('picture-src', null, null, [$me, 'macroPictureSrc']);
 
         // Přidání makra pro vygenerování src odkazu pro obrázek přes n:palette-src.
-        $me->addMacro('palette-src', null, null, [$me, 'macroPalette']);
+        $me->addMacro('palette-src', null, null, [$me, 'macroPaletteSrc']);
     }
 
 
@@ -58,6 +58,12 @@ final class LatteMacroSet extends MacroSet
         $this->isInPicture = true;
         $this->pictureSrcPhpCode = null;
         $this->macroWebPQuality = null;
+
+        // Makro n:webp je možné používat pouze na html tagu picture.
+        if (!$node->htmlNode || strtolower($node->htmlNode->name) !== 'picture')
+        {
+            throw new CompileException('Macro n:webp is allowed only on html tag <picture> in ' . $node->getNotation());
+        }
 
         // Načteme a zvalidujeme vlastní definici kvality WebP obrázků v makru.
         $quality = $node->tokenizer->fetchWord();
@@ -132,6 +138,12 @@ final class LatteMacroSet extends MacroSet
             throw new CompileException('Multiple picture-src in webp macro is forbidden in ' . $node->getNotation());
         }
 
+        // Makro n:picture-src je možné používat pouze na html tagu img.
+        if (!$node->htmlNode || strtolower($node->htmlNode->name) !== 'img')
+        {
+            throw new CompileException('Macro n:picture-src is allowed only on html tag <img> in ' . $node->getNotation());
+        }
+
         // Vygenerujeme PHP kód pro načtení zdrojového obrázku setu přes Palette.
         $this->pictureSrcPhpCode = $writer->write(
             '<?php $__paletteSourcePicture=$this->global->palette->getSourcePicture(true, %var, %node.args); ?>',
@@ -153,10 +165,21 @@ final class LatteMacroSet extends MacroSet
      * @return string
      * @throws CompileException
      */
-    public function macroPalette(MacroNode $node, PhpWriter $writer): string
+    public function macroPaletteSrc(MacroNode $node, PhpWriter $writer): string
     {
+        $htmlNodeName = $node->htmlNode ? strtolower($node->htmlNode->name) : null;
+
+        // Makro n:palette-src je možné používat pouze na html tagu img | source.
+        if (!in_array($htmlNodeName, ['img', 'source'], true))
+        {
+            throw new CompileException('Macro n:picture-src is allowed only on html tag <img> or <source> in ' . $node->getNotation());
+        }
+
+        // Vygenerujeme název html atributu s cestou k obrázku.
+        $htmlSrcAttribute = $htmlNodeName === 'source' ? 'srcset' : 'src';
+
         return
-            ' ?> src="<?php ' .
+            ' ?> ' . $htmlSrcAttribute . '="<?php ' .
             $writer->write('echo $this->global->palette->getSourcePicture(false, null, %node.args)->getPictureUrl(); ') .
             '?>"<?php ';
     }

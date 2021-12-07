@@ -47,5 +47,11 @@
     <img n:picture-src="$imageJpg, '300;300;fit&WebP'" alt="Image" />
 </picture>
 
+<div>Custom srcset</div>
+<picture>
+    <source n:palette-src="$imageJpg, '300;300;fit&Grayscale&WebP'" type="image/webP">
+    <img n:palette-src="$imageJpg, '300;300;fit'" alt="Image" />
+</picture>
+
 <div>Standalone image</div>
 <img n:palette-src="$imageJpg, '300;300;fit&Grayscale'" alt="Image" />
