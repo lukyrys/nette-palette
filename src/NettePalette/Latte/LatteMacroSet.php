@@ -4,7 +4,6 @@ namespace NettePalette\Latte;
 
 use Latte\CompileException;
 use Latte\Compiler;
-use Latte\Macro;
 use Latte\MacroNode;
 use Latte\Macros\MacroSet;
 use Latte\PhpWriter;
@@ -41,6 +40,9 @@ final class LatteMacroSet extends MacroSet
 
         // Přidání makra pro definici zdrojového obrázku picture setu (tento obrázek se používá jako fallback pro staré prohlížeče).
         $me->addMacro('picture-src', null, null, [$me, 'macroPictureSrc']);
+
+        // Přidání makra pro vygenerování src odkazu pro obrázek přes n:palette-src.
+        $me->addMacro('palette-src', null, null, [$me, 'macroPalette']);
     }
 
 
@@ -140,6 +142,22 @@ final class LatteMacroSet extends MacroSet
         return
             ' ?> src="<?php ' .
             $writer->write('echo $__paletteSourcePicture->getPictureUrl(); ') .
+            '?>"<?php ';
+    }
+
+
+    /**
+     * Definice zdrojového obrázku img tagu přes makro n:palette.
+     * @param MacroNode $node
+     * @param PhpWriter $writer
+     * @return string
+     * @throws CompileException
+     */
+    public function macroPalette(MacroNode $node, PhpWriter $writer): string
+    {
+        return
+            ' ?> src="<?php ' .
+            $writer->write('echo $this->global->palette->getSourcePicture(false, null, %node.args)->getPictureUrl(); ') .
             '?>"<?php ';
     }
 }
