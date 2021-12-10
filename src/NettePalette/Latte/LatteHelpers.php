@@ -13,7 +13,6 @@
 
 namespace NettePalette\Latte;
 
-use Nette\Utils\Image;
 use NettePalette\Palette;
 use NettePalette\SourcePicture;
 use Palette\Exception;
@@ -32,9 +31,24 @@ final class LatteHelpers
      */
     public static function getPictureMimeType(Picture $picture): ?string
     {
-        $pictureType = Image::detectTypeFromFile($picture->getImage());
+        //// Pokud se obrázek má převést na WebP, vracíme WebP mimeType.
+        if ($picture->isWebp())
+        {
+            return 'image/webp';
+        }
 
-        return $pictureType ? Image::typeToMimeType($pictureType) : null;
+        //// Vracíme mimiType zdrojového obrázku.
+        $picturePath = $picture->getImage();
+
+        // @ - files smaller than 12 bytes causes read error
+        $imageInfo = @getimagesize($picturePath);
+
+        if (!$imageInfo)
+        {
+            return null;
+        }
+
+        return $imageInfo['mime'] ?? null;
     }
 
 
