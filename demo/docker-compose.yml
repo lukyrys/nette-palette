@@ -4,6 +4,8 @@ services:
   nette-palette:
     container_name: nette-palette
     image: sidewave/php:7.4-apache
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/demo/www
     ports:
       - '80:80'
       - '443:443'
