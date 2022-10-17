@@ -3,7 +3,7 @@ version: '2.1'
 services:
   nette-palette:
     container_name: nette-palette
-    image: sidewave/php:7.4-apache
+    image: sidewave/php:7.1-apache
     environment:
       - APACHE_DOCUMENT_ROOT=/var/www/html/demo/www
     ports:

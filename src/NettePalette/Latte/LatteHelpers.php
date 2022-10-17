@@ -15,6 +15,7 @@ namespace NettePalette\Latte;
 
 use NettePalette\Palette;
 use NettePalette\SourcePicture;
+use Palette\EPictureFormat;
 use Palette\Exception;
 use Palette\Picture;
 
@@ -53,6 +54,32 @@ final class LatteHelpers
 
 
     /**
+     * Vygenerování url adresy pro fallback <img>.
+     * @param Palette $palette
+     * @param SourcePicture $sourcePicture
+     * @return string|null
+     * @throws Exception
+     */
+    public static function generateImgUrl(Palette $palette, SourcePicture $sourcePicture): ?string
+    {
+        // Zjistíme mimeType obrázku.
+        $pictureMimeType = self::getPictureMimeType($sourcePicture->getPicture());
+
+        // Pokud je zdrojový obrázek WebP, vegenerujeme JPG verzi jako fallback.
+        if ($pictureMimeType === 'image/webp' || $sourcePicture->getPicture()->isWebp())
+        {
+            return $palette->getUrl(
+                $sourcePicture->getImage(),
+                $sourcePicture->getImageQuery() . '&SaveAs;' . EPictureFormat::JPG
+            );
+        }
+
+        // V ostatních případech používáme transformaci zdrojového obrázku.
+        return $sourcePicture->getPictureUrl();
+    }
+
+
+    /**
      * Vygeneruje HTML scrsetu pro picture.
      * @param int|null $quality
      * @param Palette $palette
@@ -87,6 +114,18 @@ final class LatteHelpers
                 '<source srcset="%s" type="%s">' . "\n",
                 $sourcePicture->getPictureUrl(), // Tento obrázek je stejný s obrázkem, který se vypisuje do img tagu.
                 $pictureMimeType
+            );
+        }
+
+        // Pokud je zdrojový obrázek WebP, vegenerujeme JPG verzi jako fallback.
+        if ($pictureMimeType === 'image/webp' || $sourcePicture->getPicture()->isWebp())
+        {
+            $scrSets[] = sprintf(
+                '<source srcset="%s" type="image/jpeg">' . "\n",
+                $palette->getUrl(
+                    $sourcePicture->getImage(),
+                    $sourcePicture->getImageQuery() . '&SaveAs;' . EPictureFormat::JPG
+                )
             );
         }
 

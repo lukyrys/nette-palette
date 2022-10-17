@@ -12,7 +12,7 @@
   ],
   "require": {
     "php": ">=7.1.0",
-    "pavlista/palette": ">=2.7.8 <3.0",
+    "pavlista/palette": ">=v2.8.0 <3.0",
 
     "nette/di": "^3.0",
     "nette/application": "^3.0",
@@ -25,6 +25,7 @@
     "phpstan/phpstan-nette": "^1.0",
     "phpstan/phpstan": "^1.0"
   },
+  "minimum-stability": "rc",
   "scripts": {
     "phpstan": "vendor/bin/phpstan analyse -c phpstan.neon",
     "phpstan-baseline": "vendor/bin/phpstan analyse -c phpstan.neon --generate-baseline"

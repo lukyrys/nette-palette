@@ -14,6 +14,7 @@
 namespace NettePalette;
 
 use NettePalette\Latte\LatteHelpers;
+use Palette\EPictureFormat;
 use Throwable;
 use Tracy\Debugger;
 use Palette\Picture;

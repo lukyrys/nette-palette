@@ -155,7 +155,7 @@ final class LatteMacroSet extends MacroSet
         // Vygenerujeme PHP/HTML kód img tagu s fallbackem picture setu.
         return
             ' ?> src="<?php ' .
-            $writer->write('echo $__paletteSourcePicture->getPictureUrl(); ') .
+            $writer->write('echo NettePalette\Latte\LatteHelpers::generateImgUrl($this->global->palette, $__paletteSourcePicture); ') .
             '?>"<?php ';
     }
 
