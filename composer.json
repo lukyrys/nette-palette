@@ -25,7 +25,7 @@
     "phpstan/phpstan-nette": "^1.0",
     "phpstan/phpstan": "^1.0"
   },
-  "minimum-stability": "rc",
+  "minimum-stability": "RC",
   "scripts": {
     "phpstan": "vendor/bin/phpstan analyse -c phpstan.neon",
     "phpstan-baseline": "vendor/bin/phpstan analyse -c phpstan.neon --generate-baseline"
