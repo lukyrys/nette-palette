@@ -60,6 +60,7 @@ class Palette
      * @param string $signingKey
      * @param string|null $fallbackImage absolute or relative path to default image.
      * @param array<string, string>|null $templates palette image query templates
+     * @param array<string, string> $fallbackImages
      * @param string|null $websiteUrl
      * @param IPictureLoader|null $pictureLoader
      * @throws Exception
@@ -70,7 +71,8 @@ class Palette
         ?string $basePath,
         string $signingKey,
         ?string $fallbackImage = NULL,
-        $templates = NULL,
+        array $templates = NULL,
+        array $fallbackImages = [],
         ?string $websiteUrl = NULL,
         IPictureLoader $pictureLoader = NULL
     )
@@ -84,8 +86,22 @@ class Palette
             $this->generator->setFallbackImage($fallbackImage);
         }
 
+        // Register and validate named default images.
+        $this->generator->setNamedFallbackImages($fallbackImages);
+
+        // Control fallback image definitions.
+        if (
+            $fallbackImages
+            && !$fallbackImage
+        )
+        {
+            throw new Exception(
+                'Parameter `fallbackImage` is mandatory when parameter `fallbackImages` is filled.'
+            );
+        }
+
         // Register defined image query templates
-        if($templates && is_array($templates))
+        if($templates)
         {
             foreach ($templates as $templateName => $templateQuery)
             {
@@ -185,7 +201,7 @@ class Palette
         if($imageQuery && Strings::startsWith($imageQuery, '//'))
         {
             $imageQuery = Strings::substring($imageQuery, 2);
-            $imageUrl   = $this->getPictureGeneratorUrl($image, $imageQuery);
+            $imageUrl = $this->getPictureGeneratorUrl($image, $imageQuery, $picture);
 
             if($this->isUrlRelative)
             {
@@ -309,7 +325,7 @@ class Palette
             // Process server response.
             $this->generator->serverResponse();
         }
-        catch(\Exception $exception)
+        catch(Throwable $exception)
         {
             // Handle server generating image response exception
             if($this->handleExceptions)
@@ -335,15 +351,13 @@ class Palette
                 throw $exception;
             }
 
-            // Return fallback image on exception if fallback image is configured
-            $fallbackImage = $this->generator->getFallbackImage();
-
-            if($fallbackImage)
+            // Return fallback image on exception if fallback image is configured.
+            if($this->generator->getFallbackImage())
             {
                 /** @var string $paletteQuery */
-                $paletteQuery = preg_replace('/.*@(.*)/', $fallbackImage . '@$1', $requestImageQuery);
+                $paletteQuery = preg_replace('/.*@(.*)/','@$1', $requestImageQuery);
 
-                $picture  = $this->generator->loadPicture($paletteQuery);
+                $picture = $this->generator->loadPicture($paletteQuery);
                 $savePath = $this->generator->getPath($picture);
 
                 if(!file_exists($savePath))

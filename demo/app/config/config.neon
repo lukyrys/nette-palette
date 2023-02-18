@@ -9,15 +9,20 @@ application:
 		*: Palette\DemoApp\*Module\Presenters\*Presenter
 
 extensions:
-    palette: NettePalette\PaletteExtension
+	palette: NettePalette\PaletteExtension
 
 palette:
-    websiteUrl: 'http://127.0.0.1'
-    path: %paletteThumbsDir%
-    url: %paletteThumbsUrl%
-    basepath: '/var/www/html/demo/www/'
-    signingKey: 'HOfU2RTxbimmaYmAnrQ1'
-    webpMacroDefaultQuality: 80
+	websiteUrl: 'http://127.0.0.1'
+	path: %paletteThumbsDir%
+	url: %paletteThumbsUrl%
+	basepath: '/var/www/html/demo/www/'
+	signingKey: 'HOfU2RTxbimmaYmAnrQ1'
+	webpMacroDefaultQuality: 80
+	fallbackImage: '/var/www/html/demo/www/images/default/default.jpg'
+	fallbackImages:
+		default1: '/var/www/html/demo/www/images/default/default-1.jpg'
+		default2: '/var/www/html/demo/www/images/default/default-2.jpg'
+		default3: '/var/www/html/demo/www/images/default/default-3.jpg'
 
 session:
 	expiration: 14 days
