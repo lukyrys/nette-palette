@@ -26,6 +26,7 @@ Palette u obrázků například umožňuje: změny rozměrů, vkládání vodozn
 - **signingKey:** Náhodný řetězec, kterým se podepisují (http) požadavky na generování miniatur.
 - **basepath:** *(nepovinný)* Absolutní cesta k document rootu webu.
 - **fallbackImage:** *(nepovinný)* Absolutní cesta k obrázku, který se použije v případě, že požadovaný obrázek neexistuje (užitečné hlavně pro DEV).
+- **fallbackImages** *(nepovinný)* Definice pojmenovaných výchozích obrázků ve tvaru `název obrázku` => `absolutní cesta k obrázku`, které je možné v Palette query použít pomocí `FallbackImg`.
 - **template:** *(nepovinný)* Pole šablon ve tvaru `název šablony` => `paletteQuery`. Šablony je možné používat v palette query přes `.` např.: `.template`.
 - **websiteUrl:** *(nepovinný)* Adresa aplikace s lomítkem na konci pro generování absolutních url adres k obrázkům v cli (např.: `https://localhost/`).
 - **pictureLoader:** *(nepovinný)* Služba implementující interface `IPictureLoader`, přes kterou je možné upravit logiku načítání a generování obrázků přes Palette.
