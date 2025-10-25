@@ -88,11 +88,14 @@ class PaletteExtension extends CompilerExtension
             ->setArguments([$this->prefix('@service')]);
 
         //// Zaregistrování filtrů a maker do Latte.
+        // NOTE: Latte macros disabled for Latte 3 compatibility
+        // Using Palette service directly in presenters instead
+        /*
         $latteService = $this->getLatteService();
         $latteService
             ->addSetup('?->addProvider(?, ?)', ['@self', 'palette', $paletteService])
-            ->addSetup('?->onCompile[] = function ($engine) { NettePalette\Latte\LatteMacroSet::install($engine->getCompiler()); }', ['@self'])
             ->addSetup('addFilter', ['palette', $this->prefix('@filter')]);
+        */
 
         //// Zaregistrování vlastního mapování pro PalettePresenter.
         //// (v budoucnu bude nahrazeno za Application->onStartup[])

@@ -71,10 +71,10 @@ class Palette
         ?string $basePath,
         string $signingKey,
         ?string $fallbackImage = NULL,
-        array $templates = NULL,
+        ?array $templates = NULL,
         array $fallbackImages = [],
         ?string $websiteUrl = NULL,
-        IPictureLoader $pictureLoader = NULL
+        ?IPictureLoader $pictureLoader = NULL
     )
     {
         // Setup image generator instance
@@ -195,7 +195,7 @@ class Palette
      * @return null|string
      * @throws Exception
      */
-    public function getUrl(string $image, ?string $imageQuery = NULL, Picture &$picture = null): ?string
+    public function getUrl(string $image, ?string $imageQuery = NULL, ?Picture &$picture = null): ?string
     {
         // Experimental support for absolute picture url when is relative generator url set
         if($imageQuery && Strings::startsWith($imageQuery, '//'))
@@ -274,7 +274,7 @@ class Palette
      * @return null|string
      * @throws Exception
      */
-    protected function getPictureGeneratorUrl($image, $imageQuery = NULL, Picture &$picture = null): ?string
+    protected function getPictureGeneratorUrl($image, $imageQuery = NULL, ?Picture &$picture = null): ?string
     {
         if($imageQuery !== NULL)
         {
